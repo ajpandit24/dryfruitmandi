@@ -5,7 +5,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Products from './pages/Products'
 import Contact from './pages/Contact'
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/CartPage";
