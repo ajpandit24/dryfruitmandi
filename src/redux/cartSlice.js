@@ -45,29 +45,28 @@ const cartSlice = createSlice({
     reducers: {
         addToCart: (state, action) => {
             const newItem = action.payload;
-            const existingItem = state.cartItems.find(
-                item => item.id === newItem.id && item.variant.weight === newItem.variant.weight
-            );
             const qtyChange = newItem.quantity !== undefined ? newItem.quantity : 1;
+            const existingItem = state.cartItems.find(
+                item => item.id === newItem.id && item.variant?.weight === newItem.variant?.weight
+            );
             if (existingItem) {
                 existingItem.quantity += qtyChange;
                 if (existingItem.quantity <= 0) {
                     state.cartItems = state.cartItems.filter(
-                        item => !(item.id === newItem.id && item.variant.weight === newItem.variant.weight)
+                        item => !(item.id === newItem.id && item.variant?.weight === newItem.variant?.weight)
                     );
                 }
-
             } else {
-                state.cartItems.push({ ...newItem, qtyChange });
+                state.cartItems.push({ ...newItem, quantity: qtyChange });
             }
 
             state.totalAmount = state.cartItems.reduce(
-                (total, item) => total + item.variant.price * item.quantity, 0);
+                (total, item) => total + ((item.variant?.price ?? 0) * (item.quantity ?? 0)), 0);
             state.totalItems = state.cartItems.reduce(
-                (total, item) => total + item.quantity, 0);
+                (total, item) => total + (item.quantity ?? 0), 0);
 
             state.notifications.show = true;
-            state.notifications.message = `Added ${Math.abs(qtyChange)} x ${newItem.name} (${newItem.variant.weight}) to cart! 🛒`;
+            state.notifications.message = `Added ${Math.abs(qtyChange)} x ${newItem.name} (${newItem.variant?.weight ?? ''}) to cart! 🛒`;
 
             saveCartToLocalStorage(state);
         },
@@ -79,12 +78,12 @@ const cartSlice = createSlice({
         removeFromCart: (state, action) => {
             const { id, variant } = action.payload;
             state.cartItems = state.cartItems.filter(
-                item => !(item.id === id && item.variant.weight === variant.weight)
+                item => !(item.id === id && item.variant?.weight === variant.weight)
             );
             state.totalAmount = state.cartItems.reduce(
-                (total, item) => total + item.variant.price * item.quantity, 0);
+                (total, item) => total + ((item.variant?.price ?? 0) * (item.quantity ?? 0)), 0);
             state.totalItems = state.cartItems.reduce(
-                (total, item) => total + item.quantity, 0);
+                (total, item) => total + (item.quantity ?? 0), 0);
 
             saveCartToLocalStorage(state);
         },

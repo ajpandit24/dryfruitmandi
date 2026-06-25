@@ -1,15 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
+import Loader from './Loader';
 
 const CheckoutForm = () => {
     const dispatch = useDispatch();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { cartItems, totalAmount } = useSelector((state) => state.cart);
 
     const API_URL = import.meta.env.VITE_API_URL;
 
-    handlePlaceOrder = async (e) => {
+    const handlePlaceOrder = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         const customerDetails = {
             name: 'John Doe',
@@ -37,18 +40,28 @@ const CheckoutForm = () => {
 
             if (data.success && data.whatsappLink) {
                 window.location.href = data.whatsappLink;
-            }else{
+            } else {
                 alert('Failed to place order. Please try again.');
             }
-
         } catch (error) {
             console.error('Error placing order:', error);
             alert('An error occurred while placing the order. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <button onClick={handlePlaceOrder} className='bg-green-500 text-white px-6 py-3 rounded-md transition'>Place Order</button>
+        <div className="flex flex-col gap-3">
+            <button
+                onClick={handlePlaceOrder}
+                disabled={isSubmitting}
+                className={`bg-green-500 text-white px-6 py-3 rounded-md transition ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-emerald-600'}`}
+            >
+                {isSubmitting ? 'Placing order...' : 'Place Order'}
+            </button>
+            {isSubmitting && <Loader message="Placing order..." />}
+        </div>
     )
 }
 

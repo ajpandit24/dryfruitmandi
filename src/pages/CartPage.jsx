@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addToCart, clearCart } from '../redux/cartSlice';
 import { DeleteForever } from '@mui/icons-material';
 import { removeFromCart } from '../redux/cartSlice';
+import Loader from '../components/Loader';
+import OrderConfirmationModal from '../components/OrderConfirmationModal';
 
 export default function CartPage() {
   const dispatch = useDispatch();
@@ -14,7 +16,8 @@ export default function CartPage() {
   const [customer, setCustomer] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    address: ''
   });
 
   const API_URL = import.meta.env?.VITE_API_URL;
@@ -37,20 +40,40 @@ export default function CartPage() {
     }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+
+  const handleShowConfirmation = (e) => {
+    e.preventDefault();
+
+    if (!customer.name || !customer.email || !customer.phone || !customer.address) {
+      alert("Please fill out all details including address before placing your order.");
+      return;
+    }
+
+    setShowConfirmationModal(true);
+  };
+
+  const handleProceedCheckout = () => {
+    setShowConfirmationModal(false);
+    // Create a synthetic event for handleCheckout
+    handleCheckout({ preventDefault: () => {} });
+  };
+
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!customer.name || !customer.email || !customer.phone) {
-      alert("Please fill out all contact details before placing your order.");
+    if (!customer.name || !customer.email || !customer.phone || !customer.address) {
+      alert("Please fill out all details including address before placing your order.");
       return;
     }
 
     const orderPayload = {
       customer: customer,
-      items: cartItems,
-      totalAmount: totalAmount
+      items: cartItems
     };
 
+    setIsSubmitting(true);
     try {
       const response = await fetch(`${API_URL}/orders`, {
         method: 'POST',
@@ -62,15 +85,17 @@ export default function CartPage() {
 
       const data = await response.json();
 
-      if (data.success && data.whatsappLink) {
+      if (data.success) {
+        alert("🎉 Your order request has been placed! An automated tax invoice copy has been sent to your email and the store manager.");
         dispatch(clearCart());
-        window.location.href = data.whatsappLink;
       } else {
         alert(data.message || "Something went wrong processing your order.");
       }
     } catch (error) {
       console.error("API Error during checkout:", error);
       alert("Could not connect to the backend server.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -101,10 +126,10 @@ export default function CartPage() {
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-gray-800">{item.name}</h4>
                 <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded mt-1">
-                  Weight: {item.variant.weight}
+                  Weight: {item.variant?.weight ?? 'N/A'}
                 </span>
                 <p className="text-sm font-medium text-gray-500 mt-2">
-                  ₹{item.variant.price} each
+                  ₹{item.variant?.price ?? 0} each
                 </p>
               </div>
 
@@ -128,7 +153,7 @@ export default function CartPage() {
               {/* Total Item Price */}
               <div className="text-right sm:min-w-[100px]">
                 <span className="text-lg font-bold text-gray-900">
-                  ₹{item.variant.price * item.quantity}
+                  ₹{(item.variant?.price ?? 0) * (item.quantity ?? 0)}
                 </span>
               </div>
 
@@ -156,7 +181,7 @@ export default function CartPage() {
       <div className="bg-gray-50 rounded-xl p-6 border border-gray-200/60 h-fit sticky top-6">
         <h3 className="text-xl font-bold text-gray-900 mb-4">Checkout Details</h3>
         
-        <form onSubmit={handleCheckout} className="space-y-4">
+        <form onSubmit={handleShowConfirmation} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
             <input 
@@ -196,6 +221,19 @@ export default function CartPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Delivery Address</label>
+            <textarea 
+              name="address" 
+              value={customer.address} 
+              onChange={handleInputChange} 
+              placeholder="Enter your complete delivery address"
+              required 
+              rows="3"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm resize-none"
+            />
+          </div>
+
           <div className="border-t border-gray-200 my-4 pt-4 space-y-2">
             <div className="flex justify-between items-center text-gray-600">
               <span>Subtotal:</span>
@@ -213,12 +251,23 @@ export default function CartPage() {
           </div>
 
           <button 
-            type="submit" onClick={handleCheckout} 
+            type="submit"
             className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-3 px-4 rounded-md font-bold text-center transition-colors shadow-md flex items-center justify-center gap-2 mt-4"
+            disabled={isSubmitting}
           >
-            Place Order via WhatsApp 💬
+            {isSubmitting ? 'Placing order...' : 'Place Order'}
           </button>
+          {isSubmitting && <Loader message="Submitting order..." />}
         </form>
+
+        <OrderConfirmationModal
+          isOpen={showConfirmationModal}
+          onClose={() => setShowConfirmationModal(false)}
+          onProceed={handleProceedCheckout}
+          orderData={{ customer, items: cartItems }}
+          totalAmount={totalAmount}
+          isSubmitting={isSubmitting}
+        />
       </div>
 
     </div>
