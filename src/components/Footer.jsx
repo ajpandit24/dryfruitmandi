@@ -1,12 +1,13 @@
 import React from 'react'
 import logo from '../assets/logo.png'
+import { Link } from 'react-router-dom'
 
 const Footer = () => {
     return (
         <div>
             <footer className="bg-primary border-t-2 border-secondary w-full pt-16 pb-8">
                 <div className="container mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-gutter px-margin-desktop max-w-max-width mx-auto">
+                    <div className="gap-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-gutter px-margin-desktop max-w-max-width mx-auto">
                         <div className="col-span-1 md:col-span-2">
                             <h3 className="font-display-lg text-headline-md text-secondary-fixed mb-6">
                                 <img src={logo} alt="" className='ftr-logo' />
@@ -18,32 +19,30 @@ const Footer = () => {
                         </div> */}
                         </div>
                         <div>
-                            <h4 className="ftr-head">Collection</h4>
+                            <h4 className="ftr-head">INFORMATION</h4>
                             <ul className="space-y-3">
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Hand-Picked Nuts</a></li>
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Sun-Dried Fruits</a></li>
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Gourmet Mixes</a></li>
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Heritage Gifting</a></li>
+                                <li><Link to="/about" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">About Us</Link></li>
+                                <li><Link to="/sun-dried-fruits" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Privacy Policy</Link></li>
+                                <li><Link to="/gourmet-mixes" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Shipping &amp; Returns Policy</Link></li>
+                                <li><Link to="/heritage-gifting" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Terms &amp; Conditions</Link></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="ftr-head">Company</h4>
+                            <h4 className="ftr-head">CUSTOMER SERVICE</h4>
                             <ul className="space-y-3">
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Sustainability Report</a></li>
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Wholesale</a></li>
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Shipping &amp; Returns</a></li>
-                                <li><a className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4" href="#">Privacy Policy</a></li>
+                                <li><Link to="/sustainability-report" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Contact Us</Link></li>
+                                <li><Link to="/wholesale" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Suggestion/ Feedback</Link></li>
+                                <li><Link to="/shipping-returns" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Shipping &amp; Returns</Link></li>
+                                <li><Link to="/privacy-policy" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Privacy Policy</Link></li>
                             </ul>
                         </div>
                         <div className="col-span-1 lg:col-span-2">
-                            <h4 className="ftr-head">Stay Updated</h4>
-                            <p className="font-body-md text-on-primary-fixed-variant mb-6">Receive seasonal harvest updates and festive recipes.</p>
-                            <div className="flex shadow-2xl">
-                                <input className="bg-white border-none rounded-l-lg w-full focus:ring-0 text-primary text-sm px-4" placeholder="Email address" type="email" />
-                                <button className="bg-secondary text-primary px-6 py-3 rounded-r-lg hover:bg-secondary-fixed transition-all flex items-center justify-center">
-                                    <span className="material-symbols-outlined" data-icon="send">Send</span>
-                                </button>
-                            </div>
+                            <h4 className="ftr-head">CONTACT US</h4>
+                            <ul className="space-y-3">
+                                <li>123 Main Street, City, Country</li>
+                                <li>Phone: +1 (123) 456-7890</li>
+                                <li>Email: <a href="mailto:info@dryfruitsmandi.com" className="text-secondary-fixed hover:text-primary-fixed">info@dryfruitsmandi.com</a></li>
+                            </ul>
                         </div>
                     </div>
                     <div className="max-w-max-width mx-auto px-margin-desktop mt-16 pt-8 border-t border-on-primary/10 text-center">

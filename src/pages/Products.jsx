@@ -4,7 +4,7 @@ import ProductsList from '../components/ProductsList'
 const Products = () => {
   return (
     <section className='container'>
-      <ProductsList tabs={true} />
+      <ProductsList tabs={true} gridColumns={3} />
     </section>
   )
 }

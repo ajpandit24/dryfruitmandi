@@ -26,11 +26,12 @@ function App() {
 
           <Route path='/cart' element={<CartPage />} />
         </Routes>
+        <Footer />
     </BrowserRouter>
 
     <Toast />
 
-    <Footer />
+    
     </>
   )
 }
