@@ -6,6 +6,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
+import { setCategoryFilter, clearFilters } from '../redux/filterSlice'; // Adjust based on your filterSlice path
 import Loader from './Loader';
 
 const ProductsList = (props) => {
@@ -14,11 +15,11 @@ const ProductsList = (props) => {
     const [allProductsFlat, setAllProductsFlat] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const {activeCategory, setActiveCategory} = useSelector(state => state.filters) || {};
+    // --- FIX 1: Extract activeSubcategory correctly from Redux Store ---
+    const { activeCategory, activeSubcategory } = useSelector(state => state.filters) || {};
     
-    // Accordion UI tracking states
+    // Accordion UI tracking states for UI expansion
     const [openCategories, setOpenCategories] = useState({}); // e.g. { "Dry Fruits & Nuts": true }
-    const [activeFilter, setActiveFilter] = useState({ type: 'All', value: 'All' }); // type: 'All' | 'Category' | 'SubCategory'
 
     const dispatch = useDispatch();
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -106,16 +107,17 @@ const ProductsList = (props) => {
         }));
     };
 
-    // --- COMPUTATION FILTER LAYER ---
+    // --- FIX 2: Compute Filters using Redux variables completely ---
     const filteredProducts = allProductsFlat.filter((product) => {
-        // If no filter is set, show everything
+        // If no global category is selected, show all items
         if (!activeCategory) return true;
         
-        const matchesCategory = product.category === activeCategory;
+        // Match the category key safely
+        const matchesCategory = product.computedCategory === activeCategory;
         
-        // If a subcategory filter is also active, check both
+        // If a subcategory filter is also active in Redux, check both boundaries
         if (activeSubcategory) {
-            return matchesCategory && product.subcategory === activeSubcategory;
+            return matchesCategory && product.computedSubCategory === activeSubcategory;
         }
         
         return matchesCategory;
@@ -141,10 +143,10 @@ const ProductsList = (props) => {
                         <div className="flex flex-col gap-1">
                             {/* All Items Master Selector Button */}
                             <button
-                                onClick={() => setActiveFilter({ type: 'All', value: 'All' })}
+                                onClick={() => dispatch(clearFilters())}
                                 className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition ${
-                                    activeFilter.type === 'All'
-                                        ? 'bg-primary font-semibold'
+                                    !activeCategory
+                                        ? 'bg-emerald-600 text-white font-semibold'
                                         : 'text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
@@ -154,19 +156,19 @@ const ProductsList = (props) => {
                             {/* Loop down through Nested Map Categories */}
                             {Object.keys(nestedData).map((catName) => {
                                 const isExpanded = !!openCategories[catName];
-                                const isCurrentCatActive = activeFilter.type === 'Category' && activeFilter.value === catName;
+                                // Check active status directly against Redux state layout
+                                const isCurrentCatActive = activeCategory === catName && !activeSubcategory;
                                 const categoryImage = nestedData[catName].category_image;
 
                                 return (
                                     <div key={catName} className="border-b border-gray-50 last:border-0 py-1">
                                         <div className="flex items-center justify-between w-full rounded-lg hover:bg-gray-50 pr-2">
                                             <button
-                                                onClick={() => setActiveFilter({ type: 'Category', value: catName })}
+                                                onClick={() => dispatch(setCategoryFilter({ category: catName, subcategory: null }))}
                                                 className={`grow flex items-center gap-2 text-left px-3 py-2 text-sm font-medium transition ${
-                                                    isCurrentCatActive ? 'text-primary font-semibold' : 'text-gray-800'
+                                                    isCurrentCatActive ? 'text-emerald-600 font-semibold' : 'text-gray-800'
                                                 }`}
                                             >
-                                                {/* Optional: Tiny image thumbnail inside the sidebar item */}
                                                 <img 
                                                     src={categoryImage} 
                                                     alt="" 
@@ -189,14 +191,14 @@ const ProductsList = (props) => {
                                         {isExpanded && (
                                             <div className="ml-4 pl-2 border-l border-gray-200 mt-1 flex flex-col gap-1">
                                                 {Object.keys(nestedData[catName].subcategories || {}).map((subCatName) => {
-                                                    const isCurrentSubActive = activeFilter.type === 'SubCategory' && activeFilter.value === subCatName;
+                                                    const isCurrentSubActive = activeCategory === catName && activeSubcategory === subCatName;
                                                     return (
                                                         <button
                                                             key={subCatName}
-                                                            onClick={() => setActiveFilter({ type: 'SubCategory', value: subCatName })}
+                                                            onClick={() => dispatch(setCategoryFilter({ category: catName, subcategory: subCatName }))}
                                                             className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition ${
                                                                 isCurrentSubActive
-                                                                    ? 'bg-primary text-white font-medium shadow-xs'
+                                                                    ? 'bg-emerald-600 text-white font-medium shadow-xs'
                                                                     : 'text-gray-600 hover:bg-gray-50'
                                                             }`}
                                                         >
@@ -278,7 +280,7 @@ const ProductsList = (props) => {
                                                     </button>
                                                 </div>
 
-                                                <h2 className="category-heading font-semibold text-gray-800 mb-1 text-sm hover:text-primary transition">
+                                                <h2 className="category-heading font-semibold text-gray-800 mb-1 text-sm hover:text-emerald-600 transition">
                                                     <Link to={`/products/${id}`}>
                                                         {name}
                                                     </Link>
@@ -296,14 +298,13 @@ const ProductsList = (props) => {
                                                     </p>
                                                 </div>
 
-                                                {/* Variant Pill Selections Pack sizes */}
                                                 <ul className="flex gap-1.5 flex-wrap my-3 min-h-[1.75rem]">
                                                     {productVariants.map((v, idx) => (
                                                         <li
                                                             key={idx}
                                                             className={`cursor-pointer px-2 py-0.5 rounded-sm text-[11px] border transition font-medium ${
                                                                 idx === activeIndex
-                                                                    ? 'bg-primary text-white border-primary'
+                                                                    ? 'bg-emerald-600 text-white border-emerald-600'
                                                                     : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                                             }`}
                                                             onClick={() => handleVariantSelect(id, idx)}
@@ -314,11 +315,10 @@ const ProductsList = (props) => {
                                                 </ul>
                                             </div>
 
-                                            {/* Controls Box Footer layout anchored to lower boundary card */}
                                             <div className="mt-auto space-y-2.5 pt-2 border-t border-gray-50">
                                                 <button 
                                                     onClick={() => dispatch(addToCart(cartItem))} 
-                                                    className="w-full bg-primary hover:bg-secondary text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
+                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
                                                 >
                                                     Add to Cart
                                                 </button>

@@ -6,30 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearFilters } from '../redux/filterSlice';
 
 const Navbar = ({ Cart }) => {
-    const [isOpen, setIsOpen] = useState(false); // Mobile drawer tracking state
-    const [menuData, setMenuData] = useState({}); // Stores Category -> SubCategory structure
-    const [activeMobileCat, setActiveMobileCat] = useState(null); // Active category open on mobile
+    const [isOpen, setIsOpen] = useState(false);
+    const [activeMobileCat, setActiveMobileCat] = useState(null);
 
     const dispatch = useDispatch();
     const cart = useSelector((state) => state.cart);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-    // Fetch dynamic category navigation structure from your backend API
-    useEffect(() => {
-        const fetchNavMenu = async () => {
-            try {
-                const response = await fetch(`${API_URL}/products`);
-                const json = await response.json();
-                if (json.success && json.data) {
-                    setMenuData(json.data);
-                }
-            } catch (error) {
-                console.error("Error building navbar categories layout tree:", error);
-            }
-        };
-        fetchNavMenu();
-    }, []);
+    const menuData = useSelector((state) => state.menu.data);
 
     return (
         <div className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-xs">

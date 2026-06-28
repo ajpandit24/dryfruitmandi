@@ -10,12 +10,23 @@ import Footer from "./components/Footer";
 import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/CartPage";
 import Toast from "./components/Toast";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchMenuData } from "./redux/menuSlice";
+import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
 
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // Run globally once when the application mounts
+    dispatch(fetchMenuData());
+  }, [dispatch]);
+
+
   return (
     <>
-    <BrowserRouter>
+      <BrowserRouter>
         <Navbar />
         <Routes>
           <Route path='/' element={<Home />} />
@@ -23,15 +34,16 @@ function App() {
           <Route path='/products' element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path='/contact' element={<Contact />} />
+          <Route path='/categories' element={<CategoriesPage />} />
 
           <Route path='/cart' element={<CartPage />} />
         </Routes>
         <Footer />
-    </BrowserRouter>
+      </BrowserRouter>
 
-    <Toast />
+      <Toast />
 
-    
+
     </>
   )
 }
