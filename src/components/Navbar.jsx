@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, X, ChevronDown, ChevronRight } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearFilters } from '../redux/filterSlice';
+import { clearFilters, setCategoryFilter } from '../redux/filterSlice';
 
 const Navbar = ({ Cart }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeMobileCat, setActiveMobileCat] = useState(null);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const cart = useSelector((state) => state.cart);
 
     const menuData = useSelector((state) => state.menu.data);
+
+    const handleCategoryClick = (category, subcategory) => {
+        dispatch(setCategoryFilter({ category, subcategory }));
+        navigate(`/products?category=${encodeURIComponent(category)}&subcategory=${encodeURIComponent(subcategory)}`);
+        // setIsOpen(false);
+    }
 
     return (
         <div className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-xs">
@@ -63,17 +70,14 @@ const Navbar = ({ Cart }) => {
                                             {/* Level 2 Sub-Dropdown (Sub-Categories Flyout Panels) - FIXED FOR NEW FORMAT */}
                                             <div className="absolute left-full top-0 ml-1 w-52 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-150 p-2 space-y-0.5">
                                                 {Object.keys(menuData[categoryName].subcategories || {}).map((subCategoryName) => (
-                                                    <Link
+                                                    <div
                                                         key={subCategoryName}
-                                                        onClick={() => {
-                                                            dispatch(setCategoryFilter({ category: categoryName, subcategory: subCategoryName }));
-                                                            setIsOpen(false);
-                                                        }}
-                                                        to={`/products?category=${encodeURIComponent(categoryName)}&subcategory=${encodeURIComponent(subCategoryName)}`}
-                                                        className="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-emerald-600 rounded-md font-medium"
+                                                        onClick={() => handleCategoryClick(categoryName, subCategoryName)}
+                                                        // to={`/products?category=${encodeURIComponent(categoryName)}&subcategory=${encodeURIComponent(subCategoryName)}`}
+                                                        className="cursor-pointer block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-emerald-600 rounded-md font-medium"
                                                     >
                                                         {subCategoryName}
-                                                    </Link>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>

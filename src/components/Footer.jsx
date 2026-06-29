@@ -39,8 +39,9 @@ const Footer = () => {
                         <div className="col-span-1 lg:col-span-2">
                             <h4 className="ftr-head">CONTACT US</h4>
                             <ul className="space-y-3">
-                                <li>123 Main Street, City, Country</li>
-                                <li>Phone: +1 (123) 456-7890</li>
+                                <li>K-53, Mudi Bazar, Phase-II Market-1, Sector-19,<br/>
+                    Vashi APMC, Navi Mumbai - 400703<br/></li>
+                                <li>Phone: 7710945676</li>
                                 <li>Email: <a href="mailto:info@dryfruitsmandi.com" className="text-secondary-fixed hover:text-primary-fixed">info@dryfruitsmandi.com</a></li>
                             </ul>
                         </div>
