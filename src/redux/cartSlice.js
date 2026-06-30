@@ -61,7 +61,7 @@ const cartSlice = createSlice({
             }
 
             state.totalAmount = state.cartItems.reduce(
-                (total, item) => total + ((item.variant?.price ?? 0) * (item.quantity ?? 0)), 0);
+                (total, item) => total + ((item.totalprice ?? 0) * (item.quantity ?? 0)), 0);
             state.totalItems = state.cartItems.reduce(
                 (total, item) => total + (item.quantity ?? 0), 0);
 
@@ -76,12 +76,12 @@ const cartSlice = createSlice({
         },
 
         removeFromCart: (state, action) => {
-            const { id, variant } = action.payload;
+            const { id, variant, gst, apmc } = action.payload;
             state.cartItems = state.cartItems.filter(
                 item => !(item.id === id && item.variant?.weight === variant.weight)
             );
             state.totalAmount = state.cartItems.reduce(
-                (total, item) => total + ((item.variant?.price ?? 0) * (item.quantity ?? 0)), 0);
+                (total, item) => total + ((item.totalprice ?? 0) * (item.quantity ?? 0)), 0);
             state.totalItems = state.cartItems.reduce(
                 (total, item) => total + (item.quantity ?? 0), 0);
 

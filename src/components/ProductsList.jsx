@@ -43,6 +43,7 @@ const ProductsList = (props) => {
                         Object.keys(subcategories).forEach(subCatKey => {
                             const productsArray = subcategories[subCatKey] || [];
                             
+                            console.log(productsArray)
                             productsArray.forEach(prod => {
                                 flatList.push({
                                     ...prod,
@@ -242,6 +243,9 @@ const ProductsList = (props) => {
                                     name: name,
                                     variant: activeVariant,
                                     quantity: quantities[id] ?? 1,
+                                    gst: product.gst || "0",
+                                    apmc: product.apmc || "0",
+                                    totalprice: activeVariant.price + (activeVariant.price * (parseFloat(product.gst || "0") / 100)) + (activeVariant.price * (parseFloat(product.apmc || "0") / 100))
                                 };
 
                                 return (
