@@ -2,79 +2,77 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCategoryFilter } from '../redux/filterSlice';
-import { ChevronRight } from 'lucide-react';
 
-/**
- * Individual Category Card Component
- */
-export const CategoryCard = ({ categoryName, subcategories }) => {
+export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCategoryImage }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleCategoryClick = () => {
-        // 1. Update Redux filter state with the clicked category
-        dispatch(setCategoryFilter({ category: categoryName, subcategory: null }));
-        
-        // 2. Redirect user to the products catalog page
-        navigate(`/products?category=${encodeURIComponent(categoryName)}`);
+    const handleSubcategoryClick = () => {
+        dispatch(setCategoryFilter({ category: parentCategoryName, subcategory: subCategoryName }));
+        navigate(`/products?category=${encodeURIComponent(parentCategoryName)}&subcategory=${encodeURIComponent(subCategoryName)}`);
     };
 
-    // Grab up to 3 subcategory strings to list cleanly inside the card layout preview
-    const subPreviewList = Object.keys(subcategories || {}).slice(0, 3);
+    const fallbackImage = 'https://dummyimage.com/300x300/f5f5f5/a3a3a3&text=Product';
 
     return (
         <div 
-            onClick={handleCategoryClick}
-            className="group bg-white border border-gray-100 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+            onClick={handleSubcategoryClick}
+            className="group bg-white border border-gray-100 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all duration-300 cursor-pointer flex flex-col items-center text-center"
         >
-            <div>
-                {/* Visual placeholder icon/badge ring */}
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
-                    {categoryName.charAt(0).toUpperCase()}
-                </div>
-
-                <h3 className="font-semibold text-gray-800 text-lg group-hover:text-emerald-700 transition-colors">
-                    {categoryName}
-                </h3>
-
-                {/* Subcategories list preview */}
-                <div className="mt-2 space-y-1">
-                    {subPreviewList.map((sub) => (
-                        <span key={sub} className="block text-xs text-gray-400 truncate">
-                            • {sub}
-                        </span>
-                    ))}
-                    {Object.keys(subcategories || {}).length > 3 && (
-                        <span className="block text-[11px] text-emerald-600 font-medium pt-1">
-                            +{Object.keys(subcategories).length - 3} More
-                        </span>
-                    )}
-                </div>
+            <div className="w-full aspect-square max-w-[130px] rounded-full overflow-hidden bg-gray-50 border border-gray-100 mb-3">
+                <img 
+                    src={subCategoryImage || fallbackImage} 
+                    alt={subCategoryName} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => { e.target.src = fallbackImage; }}
+                />
             </div>
-
-            <div className="mt-5 pt-3 border-t border-gray-50 flex items-center justify-between text-xs font-medium text-emerald-600 group-hover:translate-x-1 transition-transform">
-                <span>Explore Catalog</span>
-                <ChevronRight className="w-4 h-4" />
-            </div>
+            <h3 className="font-semibold text-gray-800 text-xs md:text-sm line-clamp-2 group-hover:text-emerald-600 transition-colors uppercase">
+                {subCategoryName}
+            </h3>
         </div>
     );
 };
 
-/**
- * Main Category Grid Wrapper Layout
- */
 const Categories = ({ limit }) => {
-   const menuState = useSelector((state) => state.menu);
-    
-    // Safely extract the targets with structural defaults
+    const menuState = useSelector((state) => state.menu.data);
     const menuData = menuState?.data || {};
     const loading = menuState?.loading;
 
-    const categories = Object.keys(menuData);
-    const displayedCategories = limit ? categories.slice(0, limit) : categories;
+    console.log('Menu Data in Categories:', menuData); // Debugging: Log the menu data structure
 
-    // 2. Handle background processing state
-    if (loading && categories.length === 0) {
+    const flatSubcategories = [];
+
+    // --- READ DIRECTLY FROM NEW BACKEND ENDPOINT TREE SCHEMA ---
+    if (menuData && typeof menuData === 'object' && !Array.isArray(menuData)) {
+        Object.keys(menuData).forEach((parentCatName) => {
+            const categoryObj = menuData[parentCatName] || {};
+            const subcategoriesObj = categoryObj.subcategories || {};
+            const subKeys = Object.keys(subcategoriesObj);
+
+            if (subKeys.length > 0) {
+                subKeys.forEach((subCatName) => {
+                    const subData = subcategoriesObj[subCatName];
+                    flatSubcategories.push({
+                        subCategoryName: subCatName,
+                        parentCategoryName: parentCatName,
+                        image: subData?.subcategory_image || categoryObj?.category_image
+                    });
+                });
+            } else {
+                // Standalone parent categories fallback
+                flatSubcategories.push({
+                    subCategoryName: parentCatName,
+                    parentCategoryName: parentCatName,
+                    image: categoryObj?.category_image
+                });
+            }
+        });
+    }
+
+    const displayedSubcategories = limit ? flatSubcategories.slice(0, limit) : flatSubcategories;
+
+    if (loading && flatSubcategories.length === 0) {
         return (
             <div className="flex items-center justify-center py-12">
                 <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
@@ -83,23 +81,22 @@ const Categories = ({ limit }) => {
         );
     }
 
-    // 3. Fallback check if the API succeeds but your DB array configuration returns empty
-    if (categories.length === 0) {
+    if (flatSubcategories.length === 0) {
         return (
             <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-                No categories found in the catalogue system map.
+                No categories loaded. Check your network requests.
             </div>
         );
     }
 
     return (
-
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-            {displayedCategories.map((categoryName) => (
-                <CategoryCard 
-                    key={categoryName}
-                    categoryName={categoryName}
-                    subcategories={menuData[categoryName]?.subcategories || {}}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6">
+            {displayedSubcategories.map((sub, index) => (
+                <SubcategoryCard 
+                    key={`${sub.parentCategoryName}-${sub.subCategoryName}-${index}`}
+                    subCategoryName={sub.subCategoryName}
+                    parentCategoryName={sub.parentCategoryName}
+                    subCategoryImage={sub.image}
                 />
             ))}
         </div>

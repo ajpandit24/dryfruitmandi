@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, X, ChevronDown, ChevronRight } from 'lucide-react';
 import logo from '../assets/logo.png';
@@ -13,13 +13,22 @@ const Navbar = ({ Cart }) => {
     const navigate = useNavigate();
     const cart = useSelector((state) => state.cart);
 
-    const menuData = useSelector((state) => state.menu.data);
+    // --- FIXED: Select the actual nested data object from the menu slice ---
+    const menuState = useSelector((state) => state.menu);
+    const menuData = menuState?.data || {}; 
+
+    console.log('Menu Tree Data in Navbar:', menuData); // Debugging to see your nested keys
 
     const handleCategoryClick = (category, subcategory) => {
         dispatch(setCategoryFilter({ category, subcategory }));
         navigate(`/products?category=${encodeURIComponent(category)}&subcategory=${encodeURIComponent(subcategory)}`);
-        // setIsOpen(false);
-    }
+        setIsOpen(false); // Close mobile drawer when clicking a link
+    };
+
+    const handleClearAllFilters = () => {
+        dispatch(clearFilters()); // FIXED: Added execution parentheses ()
+        setIsOpen(false);
+    };
 
     return (
         <div className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-xs">
@@ -42,21 +51,18 @@ const Navbar = ({ Cart }) => {
 
                             {/* DYNAMIC PRODUCTS MULTI-LEVEL DROPDOWN FLYOUT */}
                             <div className="relative group py-4">
-                                <NavLink to="/products" onClick={() => {
-                                    dispatch(clearFilters)
-                                    setIsOpen(false)
-                                }
-                                } className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium inline-flex items-center gap-1 transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}>
+                                <NavLink 
+                                    to="/products" 
+                                    onClick={handleClearAllFilters} 
+                                    className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium inline-flex items-center gap-1 transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}
+                                >
                                     Products
                                     <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                 </NavLink>
 
                                 {/* Level 1 Dropdown Menu Container (Categories) */}
                                 <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2 space-y-0.5">
-                                    <Link to="/products" onClick={() => {
-                                        dispatch(clearFilters)
-                                        setIsOpen(false)
-                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-lg font-medium">
+                                    <Link to="/products" onClick={handleClearAllFilters} className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-lg font-medium">
                                         All Products
                                     </Link>
 
@@ -67,13 +73,12 @@ const Navbar = ({ Cart }) => {
                                                 <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                                             </div>
 
-                                            {/* Level 2 Sub-Dropdown (Sub-Categories Flyout Panels) - FIXED FOR NEW FORMAT */}
+                                            {/* Level 2 Sub-Dropdown (Sub-Categories Flyout Panels) */}
                                             <div className="absolute left-full top-0 ml-1 w-52 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-150 p-2 space-y-0.5">
-                                                {Object.keys(menuData[categoryName].subcategories || {}).map((subCategoryName) => (
+                                                {Object.keys(menuData[categoryName]?.subcategories || {}).map((subCategoryName) => (
                                                     <div
                                                         key={subCategoryName}
                                                         onClick={() => handleCategoryClick(categoryName, subCategoryName)}
-                                                        // to={`/products?category=${encodeURIComponent(categoryName)}&subcategory=${encodeURIComponent(subCategoryName)}`}
                                                         className="cursor-pointer block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-emerald-600 rounded-md font-medium"
                                                     >
                                                         {subCategoryName}
@@ -140,23 +145,21 @@ const Navbar = ({ Cart }) => {
 
                             {activeMobileCat === 'all' && (
                                 <div className="pl-4 mt-1 border-l border-gray-100 ml-2 space-y-1">
-                                    <Link to="/products" onClick={() => setIsOpen(false)} className="block text-sm text-gray-600 py-1.5 hover:text-emerald-600">All Items</Link>
+                                    <Link to="/products" onClick={handleClearAllFilters} className="block text-sm text-gray-600 py-1.5 hover:text-emerald-600">All Items</Link>
 
                                     {Object.keys(menuData).map((catName) => (
                                         <div key={catName} className="py-0.5">
                                             <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 pt-2 pb-1">
                                                 {catName}
                                             </div>
-                                            {/* FIXED FOR NEW FORMAT */}
-                                            {Object.keys(menuData[catName].subcategories || {}).map((subCatName) => (
-                                                <Link
+                                            {Object.keys(menuData[catName]?.subcategories || {}).map((subCatName) => (
+                                                <div
                                                     key={subCatName}
-                                                    to={`/products?category=${encodeURIComponent(catName)}&subcategory=${encodeURIComponent(subCatName)}`}
-                                                    onClick={() => setIsOpen(false)}
-                                                    className="block text-sm text-gray-600 py-1.5 pl-2 hover:text-emerald-600 border-b border-gray-50/50"
+                                                    onClick={() => handleCategoryClick(catName, subCatName)}
+                                                    className="cursor-pointer block text-sm text-gray-600 py-1.5 pl-2 hover:text-emerald-600 border-b border-gray-50/50"
                                                 >
                                                     {subCatName}
-                                                </Link>
+                                                </div>
                                             ))}
                                         </div>
                                     ))}

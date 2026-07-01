@@ -1,10 +1,8 @@
-import React, { useState } from 'react'
-// product will be loaded from API instead of local data
-import { useParams } from 'react-router-dom'
-import slide1 from '../assets/slider1.jpg'
-import { useDispatch } from 'react-redux'
-import { addToCart } from '../redux/cartSlice'
-
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import slide1 from '../assets/slider1.jpg';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../redux/cartSlice';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -15,56 +13,71 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    
+    // Ensure this resolves cleanly to your API endpoint prefix (e.g., http://localhost:5000/api)
     const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:5000/api';
 
-    const handleVariantSelect = (productId, index) => {
+    const productId = id; // Store raw string value to match backend parameter matrix types safely
+
+    const handleVariantSelect = (prodId, index) => {
         setSelectedVariantIndexes((prev) => ({
             ...prev,
-            [productId]: index,
+            [prodId]: index,
         }));
     };
 
-    const handleQuantityChange = (productId, delta) => {
+    const handleQuantityChange = (prodId, delta) => {
         setQuantities((prev) => {
-            const current = prev[productId] ?? 1;
+            const current = prev[prodId] ?? 1;
             return {
                 ...prev,
-                [productId]: Math.max(1, current + delta),
+                [prodId]: Math.max(1, current + delta),
             };
         });
     };
-    const productId = parseInt(id, 10);
 
-    React.useEffect(() => {
+    useEffect(() => {
         let mounted = true;
         const fetchProduct = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const res = await fetch(`${API_URL}/products`);
+                // Fetch directly from our new targeted single item details route
+                const res = await fetch(`${API_URL}/products/${productId}`);
+                
+                if (!res.ok) {
+                    if (res.status === 404) throw new Error('Product not found in system catalogs.');
+                    throw new Error('Network response failure.');
+                }
+                
                 const json = await res.json();
-                const found = (json.products || []).find((p) => Number(p.id) === productId);
-                if (mounted) setProduct(found || null);
+                
+                if (mounted) {
+                    // Pull data tree cleanly out of backend JSON wrapper payload
+                    setProduct(json.data || null);
+                }
             } catch (err) {
                 console.error('Failed to load product:', err);
-                if (mounted) setError('Could not load product.');
+                if (mounted) setError(err.message || 'Could not load product.');
             } finally {
                 if (mounted) setIsLoading(false);
             }
         };
-        fetchProduct();
+
+        if (productId) {
+            fetchProduct();
+        }
         return () => { mounted = false; };
     }, [productId, API_URL]);
 
     const activeIndex = selectedVariantIndexes[productId] ?? 0;
     const activeVariant = product?.variants?.[activeIndex] || product?.variants?.[0] || null;
-
-    const finalImageUrl = product?.image_url || slide1; // Fallback to slide1 if no image_url is provided
+    const finalImageUrl = product?.image_url || slide1;
 
     if (isLoading) {
         return (
             <section className='container py-12'>
-                <div className='text-center text-gray-600'>Loading product...</div>
+                <div className='text-center text-gray-600 font-medium'>Loading product specifications...</div>
             </section>
         );
     }
@@ -72,7 +85,7 @@ const ProductDetail = () => {
     if (error) {
         return (
             <section className='container py-12'>
-                <div className='text-center text-red-600'>{error}</div>
+                <div className='text-center text-red-600 font-semibold'>{error}</div>
             </section>
         );
     }
@@ -80,98 +93,100 @@ const ProductDetail = () => {
     if (!product) {
         return (
             <section className='container py-12'>
-                <div className='text-center text-gray-600'>Product not found.</div>
+                <div className='text-center text-gray-600'>Product profile not found.</div>
             </section>
         );
     }
 
     return (
-
-        <section className='container'>
-
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-6'>
-                <div>
-                    <img src={finalImageUrl} alt={product?.name || 'product'} className='w-full object-cover rounded-md' />
+        <section className='container mx-auto px-4 py-6'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-6'>
+                {/* IMAGE COLUMN */}
+                <div className='flex items-center justify-center bg-gray-50/50 rounded-2xl p-4 border border-gray-100'>
+                    <img src={finalImageUrl} alt={product?.name || 'product'} className='max-h-[500px] object-contain rounded-xl shadow-xs' />
                 </div>
 
-                <div>
+                {/* DETAILS COLUMN */}
+                <div className='flex flex-col justify-center'>
+                    <span className='text-xs uppercase tracking-wider text-emerald-600 font-bold mb-1'>{product?.category}</span>
+                    <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>{product?.name}</h1>
+                    <p className='text-gray-600 text-sm leading-relaxed mb-4'>{product?.description || 'Premium quality selection sourced fresh daily.'}</p>
 
-                    <h1 className='section-heading'>{product?.name}</h1>
-                    <p>{product?.description}</p>
-
-                    <p className='product-price'>Price: ₹{activeVariant?.price ?? 0}
-                        <span className='line-through text-gray-500 ml-2'>₹{activeVariant?.originalPrice ?? ''}</span>
+                    <p className='text-xl font-bold text-gray-900 mb-4'>
+                        Price: ₹{activeVariant?.price ?? 0}
+                        {activeVariant?.originalPrice && (
+                            <span className='line-through text-sm font-medium text-gray-400 ml-2.5'>₹{activeVariant.originalPrice}</span>
+                        )}
                     </p>
-                   
 
-                    <ul className='mt-2 flex items-center space-x-2 flex-wrap'>
-                         <p className='mb-0'>Available Variants:</p> &nbsp;
-                        {product?.variants?.map((variant, idx) => (
-                            <li
-                                key={variant.id}
-                                className={`varient ${idx === activeIndex
-                                    ? 'bg-secondary text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    {/* VARIANTS PICKER */}
+                    <div className='mb-4'>
+                        <p className='text-sm font-semibold text-gray-700 mb-2'>Available Weights:</p>
+                        <ul className='flex items-center space-x-2 flex-wrap gap-y-2'>
+                            {product?.variants?.map((variant, idx) => (
+                                <li
+                                    key={variant.weight || idx}
+                                    className={`px-4 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition ${idx === activeIndex
+                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                     }`}
-                                onClick={() => handleVariantSelect(productId, idx)}
-                            >
-                                {variant.weight}
-                            </li>
-                        ))}
-                    </ul>
+                                    onClick={() => handleVariantSelect(productId, idx)}
+                                >
+                                    {variant.weight}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
-
-                    <div className="flex items-center mt-3">
+                    {/* QUANTITY PICKER */}
+                    <div className="flex items-center mt-2 mb-6">
                         <button
                             onClick={() => handleQuantityChange(productId, -1)}
-                            className="px-3 py-1 border bg-gray-200 rounded-l hover:bg-gray-300"
-                            aria-label={`Decrease quantity of ${product?.name}`}
+                            className="px-3 py-1.5 border border-gray-200 bg-gray-50 rounded-l-lg hover:bg-gray-100 font-bold text-gray-600 transition"
+                            aria-label="Decrease quantity"
                         >
                             -
                         </button>
 
-                        {/* <div className="px-4 py-1 border-t border-b text-center min-w-[48px]">
-                                {quantities[product.id] ?? 1}
-                            </div> */}
-
-                        <input type="text" value={quantities[productId] ?? 1} onChange={(e) => setQuantities((prev) => ({ ...prev, [productId]: parseInt(e.target.value) || 1 }))}
-                            className="px-4 py-1 border-t border-b text-center max-w-[75px]" />
+                        <input 
+                            type="text" 
+                            value={quantities[productId] ?? 1} 
+                            onChange={(e) => setQuantities((prev) => ({ ...prev, [productId]: parseInt(e.target.value, 10) || 1 }))}
+                            className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none" 
+                        />
 
                         <button
                             onClick={() => handleQuantityChange(productId, 1)}
-                            className="px-3 py-1 border bg-gray-200 rounded-r hover:bg-gray-300"
-                            aria-label={`Increase quantity of ${product?.name}`}
+                            className="px-3 py-1.5 border border-gray-200 bg-gray-50 rounded-r-lg hover:bg-gray-100 font-bold text-gray-600 transition"
+                            aria-label="Increase quantity"
                         >
                             +
                         </button>
-
-                        
                     </div>
 
-                    <button
-                        onClick={() => {
-                            if (!product || !activeVariant) return;
-                            const cartItem = {
-                                id: product.id,
-                                name: product.name,
-                                variant: activeVariant,
-                                quantity: quantities[productId] ?? 1,
-                            };
-                            dispatch(addToCart(cartItem));
-                        }}
-                        className='bg-primary text-white px-4 py-2 rounded mt-4 transition'
-                    >Add to Cart</button>
-
+                    {/* ACTIONS */}
+                    <div>
+                        <button
+                            onClick={() => {
+                                if (!product || !activeVariant) return;
+                                const cartItem = {
+                                    id: product.id,
+                                    name: product.name,
+                                    variant: activeVariant,
+                                    quantity: quantities[productId] ?? 1,
+                                    image_url: finalImageUrl
+                                };
+                                dispatch(addToCart(cartItem));
+                            }}
+                            className='w-full cursor-pointer sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-xl shadow-xs transition'
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
-
-                {/* Display product images or other details here */}
-
-
             </div>
-
         </section>
-    )
-}
+    );
+};
 
-export default ProductDetail
+export default ProductDetail;

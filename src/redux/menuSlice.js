@@ -1,18 +1,35 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Replace this with your actual API base URL configuration if necessary
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// Async thunk to handle fetching menu tree structural catalog data
-export const fetchMenuData = createAsyncThunk(
-    'menu/fetchMenuData',
+/**
+ * Async Thunk to fetch complete navigation structural map 
+ * directly from the dedicated categories sheet tab endpoint.
+ */
+export const fetchCategoriesAndSubcategories = createAsyncThunk(
+    'menu/fetchCategoriesAndSubcategories',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await fetch(`${API_URL}/products`);
-            const json = await response.json();
-            if (json.success && json.data) {
-                return json.data;
+            const response = await fetch(`${API_URL}/categories`); // or whatever your endpoint is
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-            return rejectWithValue('Failed to retrieve structured data layout.');
+            
+            const result = await response.json();
+            
+            // --- FIXED PAYLOAD EXTRACTION ---
+            // If your backend returns { success: true, data: { ... } }, we need result.data
+            const finalTree = result.data ? result.data : result;
+
+            // Simple validation check: ensure it's a valid object and not empty
+            if (!finalTree || typeof finalTree !== 'object' || Object.keys(finalTree).length === 0) {
+                console.error("Backend sent an unexpected structure:", result);
+                return rejectWithValue('Invalid categories payload received from server');
+            }
+
+            return finalTree;
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -22,26 +39,36 @@ export const fetchMenuData = createAsyncThunk(
 const menuSlice = createSlice({
     name: 'menu',
     initialState: {
-        data: {},
+        data: {},        // Stores our structural tree object
         loading: false,
         error: null,
     },
-    reducers: {},
+    reducers: {
+        // Clear utility if you ever need to purge state on user logout or refresh actions
+        clearMenuState: (state) => {
+            state.data = {};
+            state.loading = false;
+            state.error = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchMenuData.pending, (state) => {
+            .addCase(fetchCategoriesAndSubcategories.pending, (state) => {
+                console.log("Categories fetch: PENDING");
                 state.loading = true;
-                state.error = null;
             })
-            .addCase(fetchMenuData.fulfilled, (state, action) => {
+            .addCase(fetchCategoriesAndSubcategories.fulfilled, (state, action) => {
+                console.log("Categories fetch: FULFILLED with payload:", action.payload);
                 state.loading = false;
                 state.data = action.payload;
             })
-            .addCase(fetchMenuData.rejected, (state, action) => {
+            .addCase(fetchCategoriesAndSubcategories.rejected, (state, action) => {
+                console.error("Categories fetch: REJECTED with error:", action.payload);
                 state.loading = false;
                 state.error = action.payload;
             });
     },
 });
 
+export const { clearMenuState } = menuSlice.actions;
 export default menuSlice.reducer;

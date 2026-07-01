@@ -12,16 +12,17 @@ import CartPage from "./pages/CartPage";
 import Toast from "./components/Toast";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { fetchMenuData } from "./redux/menuSlice";
+// import { fetchMenuData } from "./redux/menuSlice";
+import {fetchCategoriesAndSubcategories} from "./redux/menuSlice";
 import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    // Run globally once when the application mounts
-    dispatch(fetchMenuData());
-  }, [dispatch]);
+        // Sync master navigation data immediately when the site loads
+        dispatch(fetchCategoriesAndSubcategories());
+    }, [dispatch]);
 
 
   return (
