@@ -56,7 +56,7 @@ const CheckoutForm = () => {
             <button
                 onClick={handlePlaceOrder}
                 disabled={isSubmitting}
-                className={`bg-green-500 text-white px-6 py-3 rounded-md transition ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-emerald-600'}`}
+                className={`bg-primary btn text-white px-6 py-3 rounded-md transition ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary'}`}
             >
                 {isSubmitting ? 'Placing order...' : 'Place Order'}
             </button>

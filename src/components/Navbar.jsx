@@ -45,7 +45,7 @@ const Navbar = ({ Cart }) => {
                     {/* --- DESKTOP NAVIGATION --- */}
                     <div className="hidden md:flex items-center gap-1 space-x-2">
                         <nav className="flex gap-1 items-center">
-                            <NavLink to="/" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}>
+                            <NavLink to="/" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
                                 Home
                             </NavLink>
 
@@ -55,7 +55,7 @@ const Navbar = ({ Cart }) => {
                                 <NavLink
                                     to="/products"
                                     onClick={handleClearAllFilters}
-                                    className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium inline-flex items-center gap-1 transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}
+                                    className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium inline-flex items-center gap-1 transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
                                 >
                                     Products
                                     <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
@@ -69,7 +69,7 @@ const Navbar = ({ Cart }) => {
                                     {/* Top bar quick link */}
                                     {/* <div className="pb-4 mb-4 border-b border-gray-50 flex justify-between items-center">
                                         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Explore Departments</span>
-                                        <Link to="/products" onClick={handleClearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">
+                                        <Link to="/products" onClick={handleClearAllFilters} className="text-xs font-semibold text-primary hover:text-primary hover:underline">
                                             View All Products &rarr;
                                         </Link>
                                     </div> */}
@@ -96,7 +96,7 @@ const Navbar = ({ Cart }) => {
                                                                 <div
                                                                     key={subCategoryName}
                                                                     onClick={() => handleCategoryClick(categoryName, subCategoryName)}
-                                                                    className="text-left text-xs md:text-sm text-gray-600 hover:text-emerald-600 rounded transition cursor-pointer font-medium hover:translate-x-0.5 transform duration-150 py-0.5"
+                                                                    className="text-left text-xs md:text-sm text-gray-600 hover:text-primary rounded transition cursor-pointer font-medium hover:translate-x-0.5 transform duration-150 py-0.5"
                                                                 >
                                                                     {subCategoryName}
                                                                 </div>
@@ -105,7 +105,7 @@ const Navbar = ({ Cart }) => {
                                                             /* Fallback link if a category doesn't have child configurations */
                                                             <div
                                                                 onClick={() => handleCategoryClick(categoryName, categoryName)}
-                                                                className="text-left text-xs text-gray-400 italic cursor-pointer hover:text-emerald-600"
+                                                                className="text-left text-xs text-gray-400 italic cursor-pointer hover:text-primary"
                                                             >
                                                                 Browse Section
                                                             </div>
@@ -118,10 +118,10 @@ const Navbar = ({ Cart }) => {
                                 </div>
                             </div>
 
-                            <NavLink to="/about" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}>
+                            <NavLink to="/about" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
                                 About
                             </NavLink>
-                            <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}>
+                            <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
                                 Contact
                             </NavLink>
                         </nav>
@@ -130,8 +130,8 @@ const Navbar = ({ Cart }) => {
                     {/* --- RIGHT ACTIONS LAYOUT --- */}
                     <div className="hidden md:flex items-center space-x-6">
                         <Link to="/cart" className="relative p-1 group">
-                            <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-emerald-600 transition" />
-                            <span className="absolute -top-1.5 -right-1.5 bg-emerald-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-xs">
+                            <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-primary transition" />
+                            <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-xs">
                                 {cart?.totalItems || 0}
                             </span>
                         </Link>
@@ -141,7 +141,7 @@ const Navbar = ({ Cart }) => {
                     <div className="flex items-center gap-4 md:hidden">
                         <Link to="/cart" className="relative p-1">
                             <ShoppingCart className="w-6 h-6 text-gray-700" />
-                            <span className="absolute -top-1.5 -right-1.5 bg-emerald-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                            <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                                 {cart?.totalItems || 0}
                             </span>
                         </Link>
@@ -173,7 +173,7 @@ const Navbar = ({ Cart }) => {
 
                             {activeMobileCat === 'all' && (
                                 <div className="pl-4 mt-1 border-l border-gray-100 ml-2 space-y-1">
-                                    <Link to="/products" onClick={handleClearAllFilters} className="block text-sm text-gray-600 py-1.5 hover:text-emerald-600">All Items</Link>
+                                    <Link to="/products" onClick={handleClearAllFilters} className="block text-sm text-gray-600 py-1.5 hover:text-primary">All Items</Link>
 
                                     {Object.keys(menuData).map((catName) => (
                                         <div key={catName} className="py-0.5">
@@ -184,7 +184,7 @@ const Navbar = ({ Cart }) => {
                                                 <div
                                                     key={subCatName}
                                                     onClick={() => handleCategoryClick(catName, subCatName)}
-                                                    className="cursor-pointer block text-sm text-gray-600 py-1.5 pl-2 hover:text-emerald-600 border-b border-gray-50/50"
+                                                    className="cursor-pointer block text-sm text-gray-600 py-1.5 pl-2 hover:text-primary border-b border-gray-50/50"
                                                 >
                                                     {subCatName}
                                                 </div>

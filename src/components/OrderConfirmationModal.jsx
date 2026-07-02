@@ -12,11 +12,11 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 1000 }}>
             <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="sticky top-0 flex justify-between items-center bg-emerald-600 text-white p-6 border-b">
+                <div className="sticky top-0 flex justify-between items-center bg-primary text-white p-6 border-b">
                     <h2 className="text-2xl font-bold">Order Confirmation</h2>
                     <button
                         onClick={onClose}
-                        className="hover:bg-emerald-700 p-1 rounded-full transition-colors"
+                        className="hover:bg-primary p-1 rounded-full transition-colors"
                         disabled={isSubmitting}
                     >
                         <CloseIcon />
@@ -89,8 +89,8 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                                 <strong>Account Type:</strong> Current Account (Vashi Branch)
                             </div>
                             <div className="mt-3 p-3 bg-yellow-100 rounded border border-yellow-300">
-                                <strong className="text-emerald-600">GPay / PhonePe:</strong>
-                                <div className="text-emerald-700">7710945676 (Hiralal Gupta)</div>
+                                <strong className="text-primary">GPay / PhonePe:</strong>
+                                <div className="text-primary">7710945676 (Hiralal Gupta)</div>
                             </div>
                         </div>
                     </div>
@@ -121,7 +121,7 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                         <button
                             onClick={onProceed}
                             disabled={isSubmitting}
-                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="flex-1 bg-primary hover:bg-primary text-white font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {isSubmitting ? 'Processing...' : 'Proceed'}
                         </button>

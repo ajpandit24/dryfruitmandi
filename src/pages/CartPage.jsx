@@ -308,7 +308,7 @@ export default function CartPage() {
 
           <button
             type="submit"
-            className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-3 px-4 rounded-md font-bold text-center transition-colors shadow-md flex items-center justify-center gap-2 mt-4"
+            className="cursor-pointer w-full bg-primary hover:bg-secondary text-white py-3 px-4 rounded-md font-bold text-center transition-colors shadow-md flex items-center justify-center gap-2 mt-4"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Placing order...' : 'Place Order'}

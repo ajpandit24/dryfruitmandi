@@ -108,7 +108,7 @@ const ProductDetail = () => {
 
                 {/* DETAILS COLUMN */}
                 <div className='flex flex-col justify-center'>
-                    <span className='text-xs uppercase tracking-wider text-emerald-600 font-bold mb-1'>{product?.category}</span>
+                    <span className='text-xs uppercase tracking-wider text-primary font-bold mb-1'>{product?.category}</span>
                     <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>{product?.name}</h1>
                     <p className='text-gray-600 text-sm leading-relaxed mb-4'>{product?.description || 'Premium quality selection sourced fresh daily.'}</p>
 
@@ -127,7 +127,7 @@ const ProductDetail = () => {
                                 <li
                                     key={variant.weight || idx}
                                     className={`px-4 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition ${idx === activeIndex
-                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                        ? 'bg-primary border-primary text-white shadow-xs'
                                         : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                     }`}
                                     onClick={() => handleVariantSelect(productId, idx)}
@@ -178,7 +178,7 @@ const ProductDetail = () => {
                                 };
                                 dispatch(addToCart(cartItem));
                             }}
-                            className='w-full cursor-pointer sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-xl shadow-xs transition'
+                            className='w-full cursor-pointer sm:w-auto bg-primary hover:bg-primary text-white font-semibold px-8 py-3 rounded-xl shadow-xs transition'
                         >
                             Add to Cart
                         </button>

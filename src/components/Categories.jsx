@@ -17,7 +17,7 @@ export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCatego
     return (
         <div 
             onClick={handleSubcategoryClick}
-            className="group bg-white border border-gray-100 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all duration-300 cursor-pointer flex flex-col items-center text-center"
+            className="group bg-white border border-gray-100 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-primary transition-all duration-300 cursor-pointer flex flex-col items-center text-center"
         >
             {/* Round containment framework for product/subcategory assets */}
             <div className="w-full aspect-square max-w-[130px] rounded-full overflow-hidden bg-gray-50 border border-gray-100 mb-3 flex items-center justify-center">
@@ -30,7 +30,7 @@ export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCatego
             </div>
             
             {/* Subcategory Label Output */}
-            <h3 className="font-semibold text-gray-800 text-xs md:text-sm line-clamp-2 group-hover:text-emerald-600 transition-colors uppercase tracking-wide">
+            <h3 className="font-semibold text-gray-800 text-xs md:text-sm line-clamp-2 group-hover:text-primary transition-colors uppercase tracking-wide">
                 {subCategoryName}
             </h3>
         </div>
@@ -80,7 +80,7 @@ const Categories = ({ limit }) => {
     if (loading && flatSubcategories.length === 0) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                 <span className="ml-3 text-sm text-gray-500 font-medium">Loading catalog...</span>
             </div>
         );

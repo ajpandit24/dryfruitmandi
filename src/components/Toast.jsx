@@ -21,7 +21,7 @@ export default function Toast() {
 
   return (
     <div className="fixed bottom-5 right-5 z-50 animate-bounce sm:animate-none">
-      <div className="bg-emerald-600 text-white px-5 py-3.5 rounded-lg shadow-xl flex items-center gap-3 max-w-sm border border-emerald-500 transform transition-all duration-300 translate-y-0 opacity-100">
+      <div className="bg-primary text-white px-5 py-3.5 rounded-lg shadow-xl flex items-center gap-3 max-w-sm border border-primary transform transition-all duration-300 translate-y-0 opacity-100">
         
         {/* Success Icon */}
         <div className="bg-white/20 p-1.5 rounded-full">

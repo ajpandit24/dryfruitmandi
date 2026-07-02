@@ -221,7 +221,7 @@ const ProductsList = (props) => {
                             <button
                                 onClick={() => dispatch(clearFilters())}
                                 className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition ${!activeCategory
-                                    ? 'bg-emerald-600 text-white font-semibold'
+                                    ? 'bg-primary text-white font-semibold'
                                     : 'text-gray-700 hover:bg-gray-50'
                                     }`}
                             >
@@ -238,7 +238,7 @@ const ProductsList = (props) => {
                                         <div className="flex items-center justify-between w-full rounded-lg hover:bg-gray-50 pr-2">
                                             <button
                                                 onClick={() => dispatch(setCategoryFilter({ category: catName, subcategory: null }))}
-                                                className={`grow flex items-center gap-2 text-left px-3 py-2 text-sm font-medium transition ${isCurrentCatActive ? 'text-emerald-600 font-semibold' : 'text-gray-800'
+                                                className={`grow flex items-center gap-2 text-left px-3 py-2 text-sm font-medium transition ${isCurrentCatActive ? 'text-primary font-semibold' : 'text-gray-800'
                                                     }`}
                                             >
                                                 <img
@@ -267,7 +267,7 @@ const ProductsList = (props) => {
                                                             key={subCatName}
                                                             onClick={() => dispatch(setCategoryFilter({ category: catName, subcategory: subCatName }))}
                                                             className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition ${isCurrentSubActive
-                                                                ? 'bg-emerald-600 text-white font-medium shadow-xs'
+                                                                ? 'bg-primary text-white font-medium shadow-xs'
                                                                 : 'text-gray-600 hover:bg-gray-50'
                                                                 }`}
                                                         >
@@ -350,7 +350,7 @@ const ProductsList = (props) => {
                                                         </button>
                                                     </div>
 
-                                                    <h2 className="category-heading font-semibold text-gray-800 mb-1 text-sm hover:text-emerald-600 transition">
+                                                    <h2 className="category-heading font-semibold text-gray-800 mb-1 text-sm hover:text-primary transition">
                                                         <Link to={`/products/${id}`}>{name}</Link>
                                                     </h2>
 
@@ -369,7 +369,7 @@ const ProductsList = (props) => {
                                                             <li
                                                                 key={idx}
                                                                 className={`cursor-pointer px-2 py-0.5 rounded-sm text-[11px] border transition font-medium ${idx === activeIndex
-                                                                    ? 'bg-emerald-600 text-white border-emerald-600'
+                                                                    ? 'bg-primary text-white border-primary'
                                                                     : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                                                     }`}
                                                                 onClick={() => handleVariantSelect(id, idx)}
@@ -383,7 +383,7 @@ const ProductsList = (props) => {
                                                 <div className="mt-auto space-y-2.5 pt-2 border-t border-gray-50">
                                                     <button
                                                         onClick={() => dispatch(addToCart(cartItem))}
-                                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
+                                                        className="w-full bg-primary hover:bg-primary text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
                                                     >
                                                         Add to Cart
                                                     </button>
@@ -400,7 +400,7 @@ const ProductsList = (props) => {
                                     <button
                                         onClick={handleLoadMore}
                                         disabled={isLoading}
-                                        className="px-8 py-3 bg-gray-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-emerald-600 disabled:bg-gray-200 disabled:text-gray-400 transition-all duration-150 cursor-pointer shadow-xs"
+                                        className="px-8 py-3 bg-gray-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-primary disabled:bg-gray-200 disabled:text-gray-400 transition-all duration-150 cursor-pointer shadow-xs"
                                     >
                                         {isLoading ? 'Fetching Next Batch...' : 'Load More Products'}
                                     </button>
