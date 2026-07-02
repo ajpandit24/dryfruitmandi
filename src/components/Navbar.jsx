@@ -15,7 +15,7 @@ const Navbar = ({ Cart }) => {
 
     // --- FIXED: Select the actual nested data object from the menu slice ---
     const menuState = useSelector((state) => state.menu);
-    const menuData = menuState?.data || {}; 
+    const menuData = menuState?.data || {};
 
     console.log('Menu Tree Data in Navbar:', menuData); // Debugging to see your nested keys
 
@@ -50,43 +50,71 @@ const Navbar = ({ Cart }) => {
                             </NavLink>
 
                             {/* DYNAMIC PRODUCTS MULTI-LEVEL DROPDOWN FLYOUT */}
+                            {/* --- DYNAMIC MEGA MENU DROPDOWN FLYOUT --- */}
                             <div className="relative group py-4">
-                                <NavLink 
-                                    to="/products" 
-                                    onClick={handleClearAllFilters} 
+                                <NavLink
+                                    to="/products"
+                                    onClick={handleClearAllFilters}
                                     className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium inline-flex items-center gap-1 transition ${isActive ? 'text-emerald-600' : 'text-gray-700 hover:text-emerald-600'}`}
                                 >
                                     Products
                                     <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                 </NavLink>
 
-                                {/* Level 1 Dropdown Menu Container (Categories) */}
-                                <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2 space-y-0.5">
-                                    <Link to="/products" onClick={handleClearAllFilters} className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-lg font-medium">
-                                        All Products
-                                    </Link>
+                                {/* MEGA MENU CONTAINER 
+        - wide width layout centered under the header structure 
+    */}
+                                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-6xl bg-white border border-gray-100 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-6">
 
-                                    {Object.keys(menuData).map((categoryName) => (
-                                        <div key={categoryName} className="relative group/sub">
-                                            <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-lg font-medium cursor-pointer">
-                                                <span className="truncate pr-2">{categoryName}</span>
-                                                <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                            </div>
+                                    {/* Top bar quick link */}
+                                    {/* <div className="pb-4 mb-4 border-b border-gray-50 flex justify-between items-center">
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Explore Departments</span>
+                                        <Link to="/products" onClick={handleClearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">
+                                            View All Products &rarr;
+                                        </Link>
+                                    </div> */}
 
-                                            {/* Level 2 Sub-Dropdown (Sub-Categories Flyout Panels) */}
-                                            <div className="absolute left-full top-0 ml-1 w-52 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-150 p-2 space-y-0.5">
-                                                {Object.keys(menuData[categoryName]?.subcategories || {}).map((subCategoryName) => (
-                                                    <div
-                                                        key={subCategoryName}
-                                                        onClick={() => handleCategoryClick(categoryName, subCategoryName)}
-                                                        className="cursor-pointer block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-emerald-600 rounded-md font-medium"
-                                                    >
-                                                        {subCategoryName}
+                                    {/* Dynamic Mega Grid Columns Framework */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-6">
+                                        {Object.keys(menuData).map((categoryName) => {
+                                            const subcategoriesObj = menuData[categoryName]?.subcategories || {};
+                                            const subcategoryKeys = Object.keys(subcategoriesObj);
+
+                                            return (
+                                                <div key={categoryName} className="space-y-3">
+                                                    {/* COLUMN HEADER (Parent Category Level) */}
+                                                    <div className="border-b border-gray-100 pb-1.5">
+                                                        <h4 className="font-bold text-gray-900 text-xs md:text-sm tracking-wide uppercase text-left break-words">
+                                                            {categoryName}
+                                                        </h4>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
+
+                                                    {/* COLUMN ITEMS LIST (Subcategory Level Layout) */}
+                                                    <div className="flex flex-col space-y-1.5">
+                                                        {subcategoryKeys.length > 0 ? (
+                                                            subcategoryKeys.map((subCategoryName) => (
+                                                                <div
+                                                                    key={subCategoryName}
+                                                                    onClick={() => handleCategoryClick(categoryName, subCategoryName)}
+                                                                    className="text-left text-xs md:text-sm text-gray-600 hover:text-emerald-600 rounded transition cursor-pointer font-medium hover:translate-x-0.5 transform duration-150 py-0.5"
+                                                                >
+                                                                    {subCategoryName}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            /* Fallback link if a category doesn't have child configurations */
+                                                            <div
+                                                                onClick={() => handleCategoryClick(categoryName, categoryName)}
+                                                                className="text-left text-xs text-gray-400 italic cursor-pointer hover:text-emerald-600"
+                                                            >
+                                                                Browse Section
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
 

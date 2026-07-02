@@ -12,14 +12,15 @@ export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCatego
         navigate(`/products?category=${encodeURIComponent(parentCategoryName)}&subcategory=${encodeURIComponent(subCategoryName)}`);
     };
 
-    const fallbackImage = 'https://dummyimage.com/300x300/f5f5f5/a3a3a3&text=Product';
+    const fallbackImage = 'https://dummyimage.com/300x300/f5f5f5/a3a3a3&text=Ananya+Enterprises';
 
     return (
         <div 
             onClick={handleSubcategoryClick}
             className="group bg-white border border-gray-100 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all duration-300 cursor-pointer flex flex-col items-center text-center"
         >
-            <div className="w-full aspect-square max-w-[130px] rounded-full overflow-hidden bg-gray-50 border border-gray-100 mb-3">
+            {/* Round containment framework for product/subcategory assets */}
+            <div className="w-full aspect-square max-w-[130px] rounded-full overflow-hidden bg-gray-50 border border-gray-100 mb-3 flex items-center justify-center">
                 <img 
                     src={subCategoryImage || fallbackImage} 
                     alt={subCategoryName} 
@@ -27,7 +28,9 @@ export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCatego
                     onError={(e) => { e.target.src = fallbackImage; }}
                 />
             </div>
-            <h3 className="font-semibold text-gray-800 text-xs md:text-sm line-clamp-2 group-hover:text-emerald-600 transition-colors uppercase">
+            
+            {/* Subcategory Label Output */}
+            <h3 className="font-semibold text-gray-800 text-xs md:text-sm line-clamp-2 group-hover:text-emerald-600 transition-colors uppercase tracking-wide">
                 {subCategoryName}
             </h3>
         </div>
@@ -35,11 +38,12 @@ export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCatego
 };
 
 const Categories = ({ limit }) => {
-    const menuState = useSelector((state) => state.menu.data);
+    // --- FIXED SELECTOR MISMATCH TRAP ---
+    const menuState = useSelector((state) => state.menu);
     const menuData = menuState?.data || {};
     const loading = menuState?.loading;
 
-    console.log('Menu Data in Categories:', menuData); // Debugging: Log the menu data structure
+    console.log('Menu Data Tree inside Categories Component:', menuData);
 
     const flatSubcategories = [];
 
@@ -56,11 +60,12 @@ const Categories = ({ limit }) => {
                     flatSubcategories.push({
                         subCategoryName: subCatName,
                         parentCategoryName: parentCatName,
+                        // Fallback order: Explicit subcategory_image -> parent category_image -> null fallback
                         image: subData?.subcategory_image || categoryObj?.category_image
                     });
                 });
             } else {
-                // Standalone parent categories fallback
+                // Standalone parent categories fallback if no subkeys exist
                 flatSubcategories.push({
                     subCategoryName: parentCatName,
                     parentCategoryName: parentCatName,
@@ -83,14 +88,14 @@ const Categories = ({ limit }) => {
 
     if (flatSubcategories.length === 0) {
         return (
-            <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-                No categories loaded. Check your network requests.
+            <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-100 rounded-xl bg-gray-50/50 my-4">
+                No subcategories parsed. Check your network console logs.
             </div>
         );
     }
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6 py-4">
             {displayedSubcategories.map((sub, index) => (
                 <SubcategoryCard 
                     key={`${sub.parentCategoryName}-${sub.subCategoryName}-${index}`}

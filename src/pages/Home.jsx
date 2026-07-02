@@ -35,7 +35,7 @@ const Home = ({menuData}) => {
             <section className='container'>
                 <h1 className='section-heading'>Shop By Category</h1>
 
-                <Categories menuData={menuData} limit={4} />
+                <Categories menuData={menuData} limit={6} />
 
                 <div className='text-center'>
                     <Link to='/categories' className='btn mt-6 bg-primary px-4 py-2 rounded'>View All Categories</Link>
