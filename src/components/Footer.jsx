@@ -23,7 +23,6 @@ const Footer = () => {
                             <ul className="space-y-3">
                                 <li><Link to="/about" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">About Us</Link></li>
                                 <li><Link to="/sun-dried-fruits" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Privacy Policy</Link></li>
-                                <li><Link to="/gourmet-mixes" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Shipping &amp; Returns Policy</Link></li>
                                 <li><Link to="/heritage-gifting" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Terms &amp; Conditions</Link></li>
                             </ul>
                         </div>

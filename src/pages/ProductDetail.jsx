@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import slide1 from '../assets/slider1.jpg';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -13,7 +15,7 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    
+
     // Ensure this resolves cleanly to your API endpoint prefix (e.g., http://localhost:5000/api)
     const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -44,14 +46,14 @@ const ProductDetail = () => {
             try {
                 // Fetch directly from our new targeted single item details route
                 const res = await fetch(`${API_URL}/products/${productId}`);
-                
+
                 if (!res.ok) {
                     if (res.status === 404) throw new Error('Product not found in system catalogs.');
                     throw new Error('Network response failure.');
                 }
-                
+
                 const json = await res.json();
-                
+
                 if (mounted) {
                     // Pull data tree cleanly out of backend JSON wrapper payload
                     setProduct(json.data || null);
@@ -129,7 +131,7 @@ const ProductDetail = () => {
                                     className={`px-4 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition ${idx === activeIndex
                                         ? 'bg-primary border-primary text-white shadow-xs'
                                         : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                    }`}
+                                        }`}
                                     onClick={() => handleVariantSelect(productId, idx)}
                                 >
                                     {variant.weight}
@@ -142,25 +144,26 @@ const ProductDetail = () => {
                     <div className="flex items-center mt-2 mb-6">
                         <button
                             onClick={() => handleQuantityChange(productId, -1)}
-                            className="px-3 py-1.5 border border-gray-200 bg-gray-50 rounded-l-lg hover:bg-gray-100 font-bold text-gray-600 transition"
+                            className="w-8 h-8 flex items-center justify-center rounded bg-secondary cursor-pointer shadow-2xs active:scale-95 transition"
                             aria-label="Decrease quantity"
                         >
-                            -
+                            <RemoveIcon fontSize="small" />
                         </button>
 
-                        <input 
-                            type="text" 
-                            value={quantities[productId] ?? 1} 
+                        <input
+                            type="text"
+                            value={quantities[productId] ?? 1}
                             onChange={(e) => setQuantities((prev) => ({ ...prev, [productId]: parseInt(e.target.value, 10) || 1 }))}
-                            className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none" 
+                            maxLength={3}
+                            className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none"
                         />
 
                         <button
                             onClick={() => handleQuantityChange(productId, 1)}
-                            className="px-3 py-1.5 border border-gray-200 bg-gray-50 rounded-r-lg hover:bg-gray-100 font-bold text-gray-600 transition"
+                            className="bg-secondary cursor-pointer w-8 h-8 flex items-center justify-center rounded shadow-2xs hover:bg-gray-50 active:scale-95 transition"
                             aria-label="Increase quantity"
                         >
-                            +
+                            <AddIcon fontSize="small" />
                         </button>
                     </div>
 
@@ -178,7 +181,7 @@ const ProductDetail = () => {
                                 };
                                 dispatch(addToCart(cartItem));
                             }}
-                            className='w-full cursor-pointer sm:w-auto bg-primary hover:bg-primary text-white font-semibold px-8 py-3 rounded-xl shadow-xs transition'
+                            className='w-full cursor-pointer sm:w-auto btn-primary font-semibold px-8 py-3 rounded-xl shadow-xs transition'
                         >
                             Add to Cart
                         </button>

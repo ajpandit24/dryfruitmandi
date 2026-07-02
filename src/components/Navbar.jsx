@@ -33,7 +33,7 @@ const Navbar = ({ Cart }) => {
     return (
         <div className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-xs">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-20">
+                <div className="flex justify-between items-center py-2">
 
                     {/* --- LOGO --- */}
                     <div className="flex-shrink-0 font-bold text-2xl text-orange-600">
@@ -42,90 +42,7 @@ const Navbar = ({ Cart }) => {
                         </Link>
                     </div>
 
-                    {/* --- DESKTOP NAVIGATION --- */}
-                    <div className="hidden md:flex items-center gap-1 space-x-2">
-                        <nav className="flex gap-1 items-center">
-                            <NavLink to="/" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
-                                Home
-                            </NavLink>
-
-                            {/* DYNAMIC PRODUCTS MULTI-LEVEL DROPDOWN FLYOUT */}
-                            {/* --- DYNAMIC MEGA MENU DROPDOWN FLYOUT --- */}
-                            <div className="relative group py-4">
-                                <NavLink
-                                    to="/products"
-                                    onClick={handleClearAllFilters}
-                                    className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium inline-flex items-center gap-1 transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
-                                >
-                                    Products
-                                    <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
-                                </NavLink>
-
-                                {/* MEGA MENU CONTAINER 
-        - wide width layout centered under the header structure 
-    */}
-                                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-6xl bg-white border border-gray-100 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-6">
-
-                                    {/* Top bar quick link */}
-                                    {/* <div className="pb-4 mb-4 border-b border-gray-50 flex justify-between items-center">
-                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Explore Departments</span>
-                                        <Link to="/products" onClick={handleClearAllFilters} className="text-xs font-semibold text-primary hover:text-primary hover:underline">
-                                            View All Products &rarr;
-                                        </Link>
-                                    </div> */}
-
-                                    {/* Dynamic Mega Grid Columns Framework */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-6">
-                                        {Object.keys(menuData).map((categoryName) => {
-                                            const subcategoriesObj = menuData[categoryName]?.subcategories || {};
-                                            const subcategoryKeys = Object.keys(subcategoriesObj);
-
-                                            return (
-                                                <div key={categoryName} className="space-y-3">
-                                                    {/* COLUMN HEADER (Parent Category Level) */}
-                                                    <div className="border-b border-gray-100 pb-1.5">
-                                                        <h4 className="font-bold text-gray-900 text-xs md:text-sm tracking-wide uppercase text-left break-words">
-                                                            {categoryName}
-                                                        </h4>
-                                                    </div>
-
-                                                    {/* COLUMN ITEMS LIST (Subcategory Level Layout) */}
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        {subcategoryKeys.length > 0 ? (
-                                                            subcategoryKeys.map((subCategoryName) => (
-                                                                <div
-                                                                    key={subCategoryName}
-                                                                    onClick={() => handleCategoryClick(categoryName, subCategoryName)}
-                                                                    className="text-left text-xs md:text-sm text-gray-600 hover:text-primary rounded transition cursor-pointer font-medium hover:translate-x-0.5 transform duration-150 py-0.5"
-                                                                >
-                                                                    {subCategoryName}
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            /* Fallback link if a category doesn't have child configurations */
-                                                            <div
-                                                                onClick={() => handleCategoryClick(categoryName, categoryName)}
-                                                                className="text-left text-xs text-gray-400 italic cursor-pointer hover:text-primary"
-                                                            >
-                                                                Browse Section
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <NavLink to="/about" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
-                                About
-                            </NavLink>
-                            <NavLink to="/contact" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
-                                Contact
-                            </NavLink>
-                        </nav>
-                    </div>
+                    
 
                     {/* --- RIGHT ACTIONS LAYOUT --- */}
                     <div className="hidden md:flex items-center space-x-6">
@@ -150,6 +67,64 @@ const Navbar = ({ Cart }) => {
                         </button>
                     </div>
                 </div>
+
+                {/* --- DESKTOP NAVIGATION --- */}
+                    <div className="hidden md:flex items-center gap-1 space-x-2">
+                        <nav className="w-full">
+                            {/* Dynamic Horizon Categories Alignment Grid */}
+                            <div className="flex flex-wrap items-center justify-between">
+                                {Object.keys(menuData).map((categoryName) => {
+                                    const subcategoriesObj = menuData[categoryName]?.subcategories || {};
+                                    const subcategoryKeys = Object.keys(subcategoriesObj);
+
+                                    // Check if this is a standalone category (e.g., DRYFRUITS with a subcategory also named DRYFRUITS)
+                                    const isStandalone =
+                                        subcategoryKeys.length === 0 ||
+                                        (subcategoryKeys.length === 1 && subcategoryKeys[0].trim().toUpperCase() === categoryName.trim().toUpperCase());
+
+                                    if (isStandalone) {
+                                        const targetSubcategory = subcategoryKeys[0] || categoryName;
+                                        return (
+                                            <button
+                                                key={categoryName}
+                                                onClick={() => handleCategoryClick(categoryName, targetSubcategory)}
+                                                className="px-3 py-2 rounded-md text-xs md:text-sm font-semibold tracking-wide uppercase text-gray-700 hover:text-primary hover:bg-gray-50 transition duration-150 whitespace-nowrap"
+                                            >
+                                                {categoryName}
+                                            </button>
+                                        );
+                                    }
+
+                                    {/* --- MULTI-LEVEL DROPDOWN / MEGA MENU FOR SPECIFIC GROUPS --- */ }
+                                    return (
+                                        <div key={categoryName} className="relative group py-2">
+                                            <button
+                                                className="px-3 py-2 rounded-md text-xs md:text-sm font-semibold tracking-wide uppercase text-gray-700 hover:text-primary hover:bg-gray-50 inline-flex items-center gap-1 transition whitespace-nowrap"
+                                            >
+                                                {categoryName}
+                                                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                                            </button>
+
+                                            {/* DROPDOWN PANEL - Drops down cleanly right beneath its specific item anchor */}
+                                            <div className="absolute left-0 mt-1 w-64 bg-white border border-gray-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-3">
+                                                <div className="flex flex-col space-y-1">
+                                                    {subcategoryKeys.map((subCategoryName) => (
+                                                        <div
+                                                            key={subCategoryName}
+                                                            onClick={() => handleCategoryClick(categoryName, subCategoryName)}
+                                                            className="text-left text-xs md:text-sm text-gray-600 hover:text-primary hover:bg-emerald-50/50 px-3 py-2 rounded-lg transition cursor-pointer font-medium"
+                                                        >
+                                                            {subCategoryName}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </nav>
+                    </div>
 
                 {/* --- MOBILE NAVIGATION DRAWER ACCORDIONS --- */}
                 {isOpen && (

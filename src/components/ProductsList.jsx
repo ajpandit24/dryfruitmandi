@@ -333,17 +333,25 @@ const ProductsList = (props) => {
                                                     <div className="flex items-center justify-between bg-gray-100 rounded-md p-1 mb-2">
                                                         <button
                                                             onClick={() => handleQuantityChange(id, -1)}
-                                                            className="w-8 h-8 flex items-center justify-center rounded bg-white text-gray-600 shadow-2xs hover:bg-gray-50 active:scale-95 transition"
+                                                            className="w-8 h-8 flex items-center justify-center rounded bg-secondary cursor-pointer shadow-2xs active:scale-95 transition"
                                                             aria-label="Decrease quantity"
                                                         >
                                                             <RemoveIcon fontSize="small" />
                                                         </button>
-                                                        <span className="text-sm font-semibold text-gray-700 w-8 text-center select-none">
+                                                        {/* <span className="text-sm font-semibold text-gray-700 w-8 text-center select-none">
                                                             {quantities[id] ?? 1}
-                                                        </span>
+                                                        </span> */}
+                                                        <input
+                                                            type="text"
+                                                            value={quantities[id] ?? 1}
+                                                            onChange={(e) => setQuantities((prev) => ({ ...prev, [id]: parseInt(e.target.value, 10) || 1 }))}
+                                                            maxLength={3}
+                                                            className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none"
+                                                        />
+
                                                         <button
                                                             onClick={() => handleQuantityChange(id, 1)}
-                                                            className="w-8 h-8 flex items-center justify-center rounded bg-white text-gray-600 shadow-2xs hover:bg-gray-50 active:scale-95 transition"
+                                                            className="bg-secondary cursor-pointer w-8 h-8 flex items-center justify-center rounded shadow-2xs hover:bg-gray-50 active:scale-95 transition"
                                                             aria-label="Increase quantity"
                                                         >
                                                             <AddIcon fontSize="small" />
@@ -356,7 +364,7 @@ const ProductsList = (props) => {
 
                                                     <div className="flex items-baseline justify-between gap-1 mt-2 mb-3 bg-gray-50/50 p-2 rounded-md">
                                                         <p className="mb-0 font-bold text-gray-900 text-base">₹{activeVariant.price}</p>
-                                                        <p className="mb-0 text-xs text-gray-500 font-medium">
+                                                        <p className="bg-gray-200 p-1 mb-0 text-xs text-gray-500 font-medium">
                                                             {(() => {
                                                                 const { formattedPrice, label } = getWeightDisplayDetails(activeVariant?.weight, activeVariant?.price);
                                                                 return <span>₹{formattedPrice}/{label}</span>;
@@ -383,7 +391,7 @@ const ProductsList = (props) => {
                                                 <div className="mt-auto space-y-2.5 pt-2 border-t border-gray-50">
                                                     <button
                                                         onClick={() => dispatch(addToCart(cartItem))}
-                                                        className="w-full bg-primary hover:bg-primary text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
+                                                        className="w-full btn-primary text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
                                                     >
                                                         Add to Cart
                                                     </button>
@@ -400,18 +408,18 @@ const ProductsList = (props) => {
                                     <button
                                         onClick={handleLoadMore}
                                         disabled={isLoading}
-                                        className="px-8 py-3 bg-gray-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-primary disabled:bg-gray-200 disabled:text-gray-400 transition-all duration-150 cursor-pointer shadow-xs"
+                                        className="px-8 py-3 bg-primary btn-primary text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-primary disabled:bg-gray-200 disabled:text-gray-400 transition-all duration-150 cursor-pointer shadow-xs"
                                     >
-                                        {isLoading ? 'Fetching Next Batch...' : 'Load More Products'}
+                                        {isLoading ? 'Loading...' : 'Load More Products'}
                                     </button>
                                 </div>
                             )}
 
-                            {isLoading && allProductsFlat.length > 0 && (
+                            {/* {isLoading && allProductsFlat.length > 0 && (
                                 <div className="text-center py-4 text-xs text-gray-400 animate-pulse">
-                                    Updating catalog stream grid...
+                                    Updating produc...
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     )}
                 </div>

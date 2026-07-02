@@ -5,13 +5,15 @@ import { DeleteForever } from '@mui/icons-material';
 import { removeFromCart } from '../redux/cartSlice';
 import Loader from '../components/Loader';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
 
 export default function CartPage() {
   const dispatch = useDispatch();
 
   // Redux State
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
-  console.log("Cart Items:", cartItems);
+  // console.log("Cart Items:", cartItems);
 
   // Local Form State
   const [customer, setCustomer] = useState({
@@ -63,50 +65,50 @@ export default function CartPage() {
   };
 
   const handlePlaceOrder = async (customerFormData) => {
-        // Replace this with your deployed Google Apps Script Web App URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyX04r9z_KvqtVpWW-Pq3hDWF4iPChPzv4Siwx2Z4vCQ0D1f137BXn0UnzcPSYnKJfQnw/exec';
+    // Replace this with your deployed Google Apps Script Web App URL
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyX04r9z_KvqtVpWW-Pq3hDWF4iPChPzv4Siwx2Z4vCQ0D1f137BXn0UnzcPSYnKJfQnw/exec';
 
-        // 2. Format the payload to match what your Google Script expects
-        const orderPayload = {
-            invoiceNo: `INV-${Date.now().toString().slice(-6)}`, // Generates a clean temporary invoice number
-            name: customerFormData.name,
-            phone: customerFormData.phone,
-            email: customerFormData.email,
-            address: customerFormData.address,
-            // Combine cart details neatly for the spreadsheet cell
-            details: cartItems.map(item => `${item.quantity}x ${item.name} (${item.variant?.weight})`).join('\n'),
-            total: `₹${totalAmount}`
-        };
-
-        try {
-            // 3. Submit data directly to Google Sheets via standard fetch
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'cors', // Crucial to prevent Cross-Origin browser blocks
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8', // Apps Script handles text/plain payloads best natively
-                },
-                body: JSON.stringify(orderPayload)
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                console.log('Order placed successfully! Checked into spreadsheet ledger.');
-                
-                // 4. Clear cart state and redirect user to a confirmation page
-                dispatch(clearCart());
-                // navigate('/order-success');
-            } else {
-                console.error("Google Script Error:", result.error);
-                alert('There was an issue processing the ledger registry.');
-            }
-
-        } catch (error) {
-            console.error("Frontend Submission Error:", error);
-            alert('Failed to connect to the order ledger. Check internet connections.');
-        }
+    // 2. Format the payload to match what your Google Script expects
+    const orderPayload = {
+      invoiceNo: `INV-${Date.now().toString().slice(-6)}`, // Generates a clean temporary invoice number
+      name: customerFormData.name,
+      phone: customerFormData.phone,
+      email: customerFormData.email,
+      address: customerFormData.address,
+      // Combine cart details neatly for the spreadsheet cell
+      details: cartItems.map(item => `${item.quantity}x ${item.name} (${item.variant?.weight})`).join('\n'),
+      total: `₹${totalAmount}`
     };
+
+    try {
+      // 3. Submit data directly to Google Sheets via standard fetch
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors', // Crucial to prevent Cross-Origin browser blocks
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8', // Apps Script handles text/plain payloads best natively
+        },
+        body: JSON.stringify(orderPayload)
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        console.log('Order placed successfully! Checked into spreadsheet ledger.');
+
+        // 4. Clear cart state and redirect user to a confirmation page
+        dispatch(clearCart());
+        // navigate('/order-success');
+      } else {
+        console.error("Google Script Error:", result.error);
+        alert('There was an issue processing the ledger registry.');
+      }
+
+    } catch (error) {
+      console.error("Frontend Submission Error:", error);
+      alert('Failed to connect to the order ledger. Check internet connections.');
+    }
+  };
 
   const handleCheckout = async (e) => {
     e.preventDefault();
@@ -185,6 +187,25 @@ export default function CartPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleDecreaseQty(item)}
+                  className="w-8 h-8 flex items-center justify-center rounded bg-secondary cursor-pointer shadow-2xs active:scale-95 transition"
+                  aria-label="Decrease quantity"
+                >
+                  <RemoveIcon fontSize="small" />
+                </button>
+                {/* <span className="text-sm font-semibold text-gray-700 w-8 text-center select-none">
+                                                            {quantities[id] ?? 1}
+                                                        </span> */}
+                <span className="w-8 text-center font-semibold text-gray-800">{item.quantity}</span>
+
+                <button
+                  onClick={() => handleIncreaseQty(item)}
+                  className="bg-secondary cursor-pointer w-8 h-8 flex items-center justify-center rounded shadow-2xs hover:bg-gray-50 active:scale-95 transition"
+                  aria-label="Increase quantity"
+                >
+                  <AddIcon fontSize="small" />
+                </button>
+                {/* <button
+                  onClick={() => handleDecreaseQty(item)}
                   className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-50 font-bold transition-colors"
                 >
                   -
@@ -195,7 +216,7 @@ export default function CartPage() {
                   className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-50 font-bold transition-colors"
                 >
                   +
-                </button>
+                </button> */}
               </div>
 
               {/* Total Item Price */}
