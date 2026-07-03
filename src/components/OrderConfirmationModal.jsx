@@ -4,22 +4,43 @@ import { Close as CloseIcon } from '@mui/icons-material';
 const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAmount, isSubmitting }) => {
     if (!isOpen) return null;
 
-    const gstAmount = Math.round(totalAmount * 0.18 * 100) / 100; // 18% GST
-    const apmcCharges = Math.round(totalAmount * 0.02 * 100) / 100; // 2% APMC
-    const grandTotal = totalAmount + gstAmount + apmcCharges;
+    // Compute per-item APMC/GST using rates present on each item (fallback 0)
+    const round2 = (v) => Math.round(v * 100) / 100;
+
+    const computed = orderData.items.reduce((acc, item) => {
+        const qty = Number(item.quantity ?? 0);
+        const price = Number(item.variant?.price ?? item.totalprice ?? 0);
+        const base = price * qty;
+        const apmcRate = parseFloat(item.apmc ?? 0) || 0;
+        const gstRate = parseFloat(item.gst ?? 0) || 0;
+        const apmc = round2(base * (apmcRate / 100));
+        const gst = round2((base + apmc) * (gstRate / 100));
+        const total = round2(base + apmc + gst);
+        acc.subtotal += base;
+        acc.apmc += apmc;
+        acc.gst += gst;
+        acc.grand += total;
+        acc.items.push({ ...item, base, apmc, gst, total, appliedRates: { apmcRate, gstRate } });
+        return acc;
+    }, { subtotal: 0, apmc: 0, gst: 0, grand: 0, items: [] });
+
+    const apmcCharges = round2(computed.apmc);
+    const gstAmount = round2(computed.gst);
+    const grandTotal = round2(computed.subtotal + apmcCharges + gstAmount);
+    const subtotal = round2(computed.subtotal);
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 1000 }}>
             <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="sticky top-0 flex justify-between items-center bg-primary text-white p-6 border-b">
-                    <h2 className="text-2xl font-bold">Order Confirmation</h2>
+                    <h2 className="text-2xl text-white font-bold">Order Confirmation</h2>
                     <button
                         onClick={onClose}
                         className="hover:bg-primary p-1 rounded-full transition-colors"
                         disabled={isSubmitting}
                     >
-                        <CloseIcon />
+                        <CloseIcon className="cursor-pointer" />
                     </button>
                 </div>
 
@@ -28,16 +49,16 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                     {/* Order Items Summary */}
                     <div className="border-b pb-4">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">Order Items</h3>
-                        <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                            {orderData.items.map((item, index) => (
+                            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                            {computed.items.map((item, index) => (
                                 <div key={index} className="flex justify-between items-center text-sm text-gray-700">
                                     <span>
                                         {item.name} ({item.variant?.weight || 'N/A'}) × {item.quantity}
                                     </span>
                                     <span className="font-medium text-end">
-                                        ₹{((item.totalprice ?? 0) * item.quantity).toFixed(2)} <br />
+                                        ₹{Number(item.total).toFixed(2)} <br />
                                         <span className="text-xs text-gray-500">
-                                            (Price: ₹{item.variant?.price ?? 0}, GST: {item.gst ?? 0}%, APMC: {item.apmc ?? 0}%)
+                                            (Price: ₹{item.variant?.price ?? 0}, APMC: {item.appliedRates?.apmcRate ?? 0}%, GST: {item.appliedRates?.gstRate ?? 0}%)
                                         </span>
                                     </span>
                                 </div>
@@ -61,10 +82,22 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
 
                     {/* Charges Breakdown */}
                     <div className="border-b pb-4 bg-blue-50 p-4 rounded-lg">
-                        <div className="space-y-2 text-sm">
+                            <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Total Amount</h3>
-                                <span className="font-medium">₹{totalAmount.toFixed(2)}</span>
+                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Subtotal</h3>
+                                <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-blue-700">
+                                <span>APMC Charges:</span>
+                                <span className="font-medium">+ ₹{apmcCharges.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-blue-700">
+                                <span>GST (on subtotal + APMC):</span>
+                                <span className="font-medium">+ ₹{gstAmount.toFixed(2)}</span>
+                            </div>
+                            <div className="border-t-2 border-blue-200 pt-2 mt-2 flex justify-between">
+                                <span className="font-bold text-gray-900">Grand Total:</span>
+                                <span className="text-xl font-bold text-emerald-600">₹{grandTotal.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
@@ -90,7 +123,7 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                             </div>
                             <div className="mt-3 p-3 bg-yellow-100 rounded border border-yellow-300">
                                 <strong className="text-primary">GPay / PhonePe:</strong>
-                                <div className="text-primary">7710945676 (Hiralal Gupta)</div>
+                                <div className="text-primary">720860 7196 (Hiralal Gupta)</div>
                             </div>
                         </div>
                     </div>
@@ -114,14 +147,14 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                         <button
                             onClick={onClose}
                             disabled={isSubmitting}
-                            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 cursor-pointer bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={onProceed}
                             disabled={isSubmitting}
-                            className="flex-1 bg-primary hover:bg-primary text-white font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="flex-1 cursor-pointer bg-primary hover:bg-primary text-white font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {isSubmitting ? 'Processing...' : 'Proceed'}
                         </button>

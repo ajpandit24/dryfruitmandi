@@ -22,8 +22,8 @@ const Footer = () => {
                             <h4 className="ftr-head">INFORMATION</h4>
                             <ul className="space-y-3">
                                 <li><Link to="/about" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">About Us</Link></li>
-                                <li><Link to="/sun-dried-fruits" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Privacy Policy</Link></li>
-                                <li><Link to="/heritage-gifting" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Terms &amp; Conditions</Link></li>
+                                <li><Link to="/privacy-policy" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Privacy Policy</Link></li>
+                                <li><Link to="/shipping-policy" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Shipping Policy</Link></li>
                             </ul>
                         </div>
                         <div>
@@ -31,8 +31,7 @@ const Footer = () => {
                             <ul className="space-y-3">
                                 <li><Link to="/sustainability-report" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Contact Us</Link></li>
                                 <li><Link to="/wholesale" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Suggestion/ Feedback</Link></li>
-                                <li><Link to="/shipping-returns" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Shipping &amp; Returns</Link></li>
-                                <li><Link to="/privacy-policy" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Privacy Policy</Link></li>
+                                <li><Link to="/refund-policy" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Returns Policy</Link></li>
                             </ul>
                         </div>
                         <div className="col-span-1 lg:col-span-2">
@@ -40,7 +39,7 @@ const Footer = () => {
                             <ul className="space-y-3">
                                 <li>K-53, Mudi Bazar, Phase-II Market-1, Sector-19,<br/>
                     Vashi APMC, Navi Mumbai - 400703<br/></li>
-                                <li>Phone: 7710945676</li>
+                                <li>Phone: 720860 7196</li>
                                 <li>Email: <a href="mailto:info@dryfruitsmandi.com" className="text-secondary-fixed hover:text-primary-fixed">info@dryfruitsmandi.com</a></li>
                             </ul>
                         </div>

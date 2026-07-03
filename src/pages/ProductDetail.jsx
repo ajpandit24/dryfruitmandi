@@ -76,6 +76,29 @@ const ProductDetail = () => {
     const activeVariant = product?.variants?.[activeIndex] || product?.variants?.[0] || null;
     const finalImageUrl = product?.image_url || slide1;
 
+    const getWeightDisplayDetails = (weight, currentTierPrice) => {
+        if (!weight) return { isWeightBased: false, formattedPrice: currentTierPrice, label: 'unit' };
+        const lowerWeight = weight.toLowerCase();
+        const value = parseFloat(weight) || 1;
+        const isKg = lowerWeight.includes('kg');
+        const isGm = lowerWeight.includes('gm') || lowerWeight.includes('gram') || (lowerWeight.includes('g') && !lowerWeight.includes('b') && !lowerWeight.includes('p'));
+
+        if (isKg || isGm) {
+            const weightInGrams = isKg ? value * 1000 : value;
+            const pricePerKg = Math.round((currentTierPrice / weightInGrams) * 1000);
+            return { isWeightBased: true, formattedPrice: pricePerKg, label: 'kg' };
+        }
+
+        let unitLabel = 'unit';
+        if (lowerWeight.includes('tin')) unitLabel = 'tin';
+        else if (lowerWeight.includes('pkt')) unitLabel = 'pkt';
+        else if (lowerWeight.includes('btl')) unitLabel = 'btl';
+        else if (lowerWeight.includes('pc')) unitLabel = 'pc';
+
+        return { isWeightBased: false, formattedPrice: Math.round(currentTierPrice / value), label: unitLabel };
+    };
+
+
     if (isLoading) {
         return (
             <section className='container py-12'>
@@ -114,12 +137,20 @@ const ProductDetail = () => {
                     <h1 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>{product?.name}</h1>
                     <p className='text-gray-600 text-sm leading-relaxed mb-4'>{product?.description || 'Premium quality selection sourced fresh daily.'}</p>
 
-                    <p className='text-xl font-bold text-gray-900 mb-4'>
-                        Price: ₹{activeVariant?.price ?? 0}
-                        {activeVariant?.originalPrice && (
-                            <span className='line-through text-sm font-medium text-gray-400 ml-2.5'>₹{activeVariant.originalPrice}</span>
-                        )}
-                    </p>
+                    <div className='flex gap-4 items-center space-x-4 mb-4'>
+                        <p className='text-xl font-bold text-gray-900'>
+                            Price: ₹{activeVariant?.price ?? 0}
+                            {activeVariant?.originalPrice && (
+                                <span className='line-through text-sm font-medium text-gray-400 ml-2.5'>₹{activeVariant.originalPrice}</span>
+                            )}
+                        </p>
+                        <p className="bg-primary text-white p-1 text-xs font-medium">
+                            {(() => {
+                                const { formattedPrice, label } = getWeightDisplayDetails(activeVariant?.weight, activeVariant?.price);
+                                return <span>₹{formattedPrice}/{label}</span>;
+                            })()}
+                        </p>
+                    </div>
 
                     {/* VARIANTS PICKER */}
                     <div className='mb-4'>

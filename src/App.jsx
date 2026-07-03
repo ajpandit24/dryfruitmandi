@@ -15,6 +15,9 @@ import { useEffect } from "react";
 // import { fetchMenuData } from "./redux/menuSlice";
 import {fetchCategoriesAndSubcategories} from "./redux/menuSlice";
 import CategoriesPage from "./pages/CategoriesPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
 
 function App() {
 
@@ -36,6 +39,10 @@ function App() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/categories' element={<CategoriesPage />} />
+
+          <Route path='/privacy-policy' element={<PrivacyPolicy />} />
+          <Route path='/refund-policy' element={<RefundPolicy />} />
+          <Route path='/shipping-policy' element={<ShippingPolicy />} />
 
           <Route path='/cart' element={<CartPage />} />
         </Routes>

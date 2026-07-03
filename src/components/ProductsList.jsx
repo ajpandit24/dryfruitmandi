@@ -213,7 +213,7 @@ const ProductsList = (props) => {
                 {/* --- LEFT SIDEBAR ACCORDION FILTERS --- */}
                 {tabs && (
                     <div className="w-full md:w-64 bg-white border border-gray-200 rounded-xl p-4 shrink-0 shadow-xs sticky top-24">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 px-1">
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 pb-3 px-1">
                             Categories
                         </h3>
 
@@ -241,12 +241,12 @@ const ProductsList = (props) => {
                                                 className={`grow flex items-center gap-2 text-left px-3 py-2 text-sm font-medium transition ${isCurrentCatActive ? 'text-primary font-semibold' : 'text-gray-800'
                                                     }`}
                                             >
-                                                <img
+                                                {/* <img
                                                     src={categoryImage}
                                                     alt=""
                                                     className="w-5 h-5 rounded-full object-cover border border-gray-100"
                                                     onError={(e) => { e.target.style.display = 'none'; }}
-                                                />
+                                                /> */}
                                                 <span>{catName}</span>
                                             </button>
 
@@ -364,7 +364,7 @@ const ProductsList = (props) => {
 
                                                     <div className="flex items-baseline justify-between gap-1 mt-2 mb-3 bg-gray-50/50 p-2 rounded-md">
                                                         <p className="mb-0 font-bold text-gray-900 text-base">₹{activeVariant.price}</p>
-                                                        <p className="bg-gray-200 p-1 mb-0 text-xs text-gray-500 font-medium">
+                                                        <p className="bg-primary text-white p-1 mb-0 text-xs font-medium">
                                                             {(() => {
                                                                 const { formattedPrice, label } = getWeightDisplayDetails(activeVariant?.weight, activeVariant?.price);
                                                                 return <span>₹{formattedPrice}/{label}</span>;

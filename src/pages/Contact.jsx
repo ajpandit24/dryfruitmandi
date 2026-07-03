@@ -62,7 +62,7 @@ const Contact = () => {
 
           <div className='bg-gray-50 p-6 rounded-lg mb-8 space-y-2 text-sm'>
             <p className='text-gray-800'><span className='font-semibold'>Email:</span> info@dryfruitsstore.com</p>
-            <p className='text-gray-800'><span className='font-semibold'>Phone:</span> 7710945676</p>
+            <p className='text-gray-800'><span className='font-semibold'>Phone:</span> 720860 7196</p>
             <p className='text-gray-800'><span className='font-semibold'>Address:</span> K-53, Mudi Bazar, Phase-II Market-1, <br /> Sector-19, Vashi APMC, Navi Mumbai - 400703</p>
             <p className='text-gray-800'><span className='font-semibold'>Business Hours:</span> Monday - Friday: 9:00 AM - 6:00 PM</p>
           </div>

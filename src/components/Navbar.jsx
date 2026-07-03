@@ -88,7 +88,7 @@ const Navbar = ({ Cart }) => {
                                             <button
                                                 key={categoryName}
                                                 onClick={() => handleCategoryClick(categoryName, targetSubcategory)}
-                                                className="px-3 py-2 rounded-md text-xs md:text-sm font-semibold tracking-wide uppercase text-gray-700 hover:text-primary hover:bg-gray-50 transition duration-150 whitespace-nowrap"
+                                                className="px-3 cursor-pointer py-2 rounded-md text-xs md:text-sm font-semibold tracking-wide uppercase text-gray-700 hover:text-primary hover:bg-gray-50 transition duration-150 whitespace-nowrap"
                                             >
                                                 {categoryName}
                                             </button>
@@ -99,7 +99,7 @@ const Navbar = ({ Cart }) => {
                                     return (
                                         <div key={categoryName} className="relative group py-2">
                                             <button
-                                                className="px-3 py-2 rounded-md text-xs md:text-sm font-semibold tracking-wide uppercase text-gray-700 hover:text-primary hover:bg-gray-50 inline-flex items-center gap-1 transition whitespace-nowrap"
+                                                className="cursor-pointer px-3 py-2 rounded-md text-xs md:text-sm font-semibold tracking-wide uppercase text-gray-700 hover:text-primary hover:bg-gray-50 inline-flex items-center gap-1 transition whitespace-nowrap"
                                             >
                                                 {categoryName}
                                                 <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />

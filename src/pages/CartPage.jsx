@@ -237,7 +237,7 @@ export default function CartPage() {
               <div className="text-right sm:min-w-[30px]">
                 <DeleteForever
                   onClick={() => dispatch(removeFromCart({ id: item.id, variant: item.variant }))}
-                  className="text-red-500 hover:text-red-700 transition-colors"
+                  className="text-red-500 cursor-pointer hover:text-red-700 transition-colors"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ export default function CartPage() {
         <div className="mt-6 pt-4 border-t border-gray-200">
           <button
             onClick={() => dispatch(clearCart())}
-            className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
+            className="text-sm cursor-pointer font-medium text-red-500 hover:text-red-700 transition-colors"
           >
             Clear Entire Cart
           </button>
@@ -323,7 +323,7 @@ export default function CartPage() {
             <hr className="border-gray-200" />
             <div className="flex justify-between items-center pt-1">
               <span className="text-base font-bold text-gray-900">Total Amount:</span>
-              <span className="text-2xl font-black text-gray-900">₹{parseFloat(totalAmount).toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">₹{Number(totalAmount).toFixed(2)}</span>
             </div>
           </div>
 
