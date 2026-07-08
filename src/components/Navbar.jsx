@@ -38,7 +38,7 @@ const Navbar = ({ Cart }) => {
                     {/* --- LOGO --- */}
                     <div className="flex-shrink-0 font-bold text-2xl text-orange-600">
                         <Link to="/">
-                            <img src={logo} alt="DryFruits Mandi" className="h-12 w-auto object-contain" />
+                            <img src={logo} alt="DryFruits Mandi" className="logo h-12 w-auto object-contain" />
                         </Link>
                     </div>
 

@@ -206,7 +206,7 @@ const ProductsList = (props) => {
     };
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 py-4">
+        <div className="w-full max-w-7xl mx-auto py-4">
 
             <div className={`flex flex-col md:flex-row gap-8 ${tabs ? 'items-start' : ''}`}>
 
@@ -294,7 +294,7 @@ const ProductsList = (props) => {
                         </div>
                     ) : (
                         <div>
-                            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-${props.gridColumns || 3} gap-6`}>
+                            <div className={`grid grid-cols-2 md:grid-cols-${props.gridColumns || 3} gap-4`}>
                                 {allProductsFlat.map((product) => {
                                     const { id, name, category, variants, image_url } = product || {};
                                     const productVariants = variants || [];
