@@ -123,7 +123,7 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                             </div>
                             <div className="mt-3 p-3 bg-yellow-100 rounded border border-yellow-300">
                                 <strong className="text-primary">GPay / PhonePe:</strong>
-                                <div className="text-primary">720860 7196 (Hiralal Gupta)</div>
+                                <div className="text-primary">77109 45676 (Hiralal Gupta)</div>
                             </div>
                         </div>
                     </div>
