@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,11 +10,11 @@ import { setCategoryFilter, clearFilters } from '../redux/filterSlice';
 import Loader from './Loader';
 
 const ProductsList = (props) => {
-    const { limit, tabs } = props; // tabs true means full shop view with sidebar, false means home page summary grid
+    const { limit, tabs } = props;
 
     // --- STATE TRACKING ---
-    const [nestedData, setNestedData] = useState({}); // Stores category structure map for the sidebar accordion 
-    const [allProductsFlat, setAllProductsFlat] = useState([]); // Accumulates products fetched from the paginated API
+    const [nestedData, setNestedData] = useState({});
+    const [allProductsFlat, setAllProductsFlat] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     // Pagination Metadata State
@@ -30,14 +30,15 @@ const ProductsList = (props) => {
     const dispatch = useDispatch();
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+    // Ref to track the element at the bottom of the list
+    const observerTarget = useRef(null);
+
     // ==========================================
-    // EFFECT 1: RESET LIST WHEN FILTERS ALTER
+    // EFFECT 1: FETCH CATEGORIES (FIXED DUPLICATION)
     // ==========================================
-    // 1. Initial load to capture ALL categories once, ignoring pagination limits
     useEffect(() => {
         const initializeCategoriesAndData = async () => {
             try {
-                // Fetch a larger chunk initially without pagination constraints just to parse categories
                 const response = await fetch(`${API_URL}/products?page=1&limit=500`);
                 const json = await response.json();
 
@@ -63,55 +64,14 @@ const ProductsList = (props) => {
         if (tabs) {
             initializeCategoriesAndData();
         }
-    }, [tabs]);
-
-    // 2. Keep your filtering effect running seamlessly right below it
-    // 1. Initial load to capture ALL categories once, ignoring pagination limits
-    useEffect(() => {
-        const initializeCategoriesAndData = async () => {
-            try {
-                // Fetch a larger chunk initially without pagination constraints just to parse categories
-                const response = await fetch(`${API_URL}/products?page=1&limit=500`);
-                const json = await response.json();
-
-                if (json.success && json.data) {
-                    const structuralMap = {};
-                    json.data.forEach(p => {
-                        if (!structuralMap[p.category]) {
-                            structuralMap[p.category] = {
-                                category_name: p.category,
-                                category_image: p.image_url,
-                                subcategories: {}
-                            };
-                        }
-                        structuralMap[p.category].subcategories[p.sub_category] = [];
-                    });
-                    setNestedData(structuralMap);
-                }
-            } catch (error) {
-                console.error("Error setting up menu structure:", error);
-            }
-        };
-
-        if (tabs) {
-            initializeCategoriesAndData();
-        }
-    }, [tabs]);
-
-    // 2. Keep your filtering effect running seamlessly right below it
-    useEffect(() => {
-        setPage(1);
-        setAllProductsFlat([]);
-        loadProductChunk(1, activeCategory, activeSubcategory, true);
-    }, [activeCategory, activeSubcategory]);
+    }, [tabs, API_URL]);
 
     // ==========================================
     // CORE FUNCTION: REQUEST CHUNKS FROM API
     // ==========================================
-    const loadProductChunk = async (pageNum, cat, subCat, isNewFilter = false) => {
+    const loadProductChunk = useCallback(async (pageNum, cat, subCat, isNewFilter = false) => {
         setIsLoading(true);
         try {
-            // Set up limits based on whether it's a homepage snippet grid or full catalogue view
             const requestLimit = limit || 12;
             let url = `${API_URL}/products?page=${pageNum}&limit=${requestLimit}`;
 
@@ -122,16 +82,24 @@ const ProductsList = (props) => {
             const json = await response.json();
 
             if (json.success && json.data) {
-                // 1. Append data dynamically if scrolling, or replace it if starting fresh on page 1
-                setAllProductsFlat(prev => isNewFilter ? json.data : [...prev, ...json.data]);
+                // Deduplicate items automatically by tracking unique product IDs
+                setAllProductsFlat(prev => {
+                    const incomingData = isNewFilter ? json.data : [...prev, ...json.data];
 
-                // 2. Map structural setup metrics from the backend pagination block
+                    // Use a Map to keep only the first occurrence of any product ID
+                    const uniqueMap = new Map();
+                    incomingData.forEach(item => {
+                        if (item && item.id) {
+                            uniqueMap.set(item.id, item);
+                        }
+                    });
+
+                    return Array.from(uniqueMap.values());
+                });
+
                 setHasMore(json.pagination.hasMore);
 
-                // 3. Fallback: Pop out category tree maps for sidebar if they aren't parsed yet
-                // To keep performance high, you could eventually move categories to their own small endpoint
                 if (isNewFilter && Object.keys(nestedData).length === 0) {
-                    // Quick placeholder recovery: build lightweight shells so structural buttons don't blank out
                     const structuralMap = {};
                     json.data.forEach(p => {
                         if (!structuralMap[p.category]) {
@@ -151,16 +119,50 @@ const ProductsList = (props) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [limit, API_URL, nestedData]);
 
     // ==========================================
-    // ACTION HANDLER: USER REQUESTS NEXT PAGE
+    // EFFECT 2: RESET LIST WHEN FILTERS ALTER
     // ==========================================
-    const handleLoadMore = () => {
-        const nextPage = page + 1;
-        setPage(nextPage);
-        loadProductChunk(nextPage, activeCategory, activeSubcategory, false);
-    };
+    useEffect(() => {
+        setPage(1);
+        setAllProductsFlat([]);
+        loadProductChunk(1, activeCategory, activeSubcategory, true);
+    }, [activeCategory, activeSubcategory, loadProductChunk]);
+
+    // ==========================================
+    // EFFECT 3: INFINITE SCROLL OBSERVER
+    // ==========================================
+    // ==========================================
+    // EFFECT 3: INFINITE SCROLL OBSERVER (FIXED DOUBLE FETCH)
+    // ==========================================
+    useEffect(() => {
+        const target = observerTarget.current;
+
+        // CRITICAL GUARD: Stop observer if there's nothing more to fetch,
+        // if a network request is active, or if we are currently wiping/resetting the list.
+        if (!target || !hasMore || isLoading || limit || allProductsFlat.length === 0) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                setPage((prevPage) => {
+                    const nextPage = prevPage + 1;
+                    loadProductChunk(nextPage, activeCategory, activeSubcategory, false);
+                    return nextPage;
+                });
+            }
+        }, {
+            rootMargin: '200px', // Pre-fetch next row before hitting the absolute bottom
+            threshold: 0
+        });
+
+        observer.observe(target);
+
+        return () => {
+            if (target) observer.unobserve(target);
+        };
+    }, [hasMore, isLoading, activeCategory, activeSubcategory, loadProductChunk, limit, allProductsFlat.length]);
+
 
     const [selectedVariantIndexes, setSelectedVariantIndexes] = useState({});
     const [quantities, setQuantities] = useState({});
@@ -207,7 +209,6 @@ const ProductsList = (props) => {
 
     return (
         <div className="w-full max-w-7xl mx-auto py-4">
-
             <div className={`flex flex-col md:flex-row gap-8 ${tabs ? 'items-start' : ''}`}>
 
                 {/* --- LEFT SIDEBAR ACCORDION FILTERS --- */}
@@ -231,7 +232,6 @@ const ProductsList = (props) => {
                             {Object.keys(nestedData).map((catName) => {
                                 const isExpanded = !!openCategories[catName];
                                 const isCurrentCatActive = activeCategory === catName && !activeSubcategory;
-                                const categoryImage = nestedData[catName].category_image;
 
                                 return (
                                     <div key={catName} className="border-b border-gray-50 last:border-0 py-1">
@@ -241,12 +241,6 @@ const ProductsList = (props) => {
                                                 className={`grow flex items-center gap-2 text-left px-3 py-2 text-sm font-medium transition ${isCurrentCatActive ? 'text-primary font-semibold' : 'text-gray-800'
                                                     }`}
                                             >
-                                                {/* <img
-                                                    src={categoryImage}
-                                                    alt=""
-                                                    className="w-5 h-5 rounded-full object-cover border border-gray-100"
-                                                    onError={(e) => { e.target.style.display = 'none'; }}
-                                                /> */}
                                                 <span>{catName}</span>
                                             </button>
 
@@ -287,7 +281,7 @@ const ProductsList = (props) => {
                 {/* --- RIGHT SIDE MAIN PRODUCTS GRID LAYER --- */}
                 <div className="grow w-full">
                     {allProductsFlat.length === 0 && isLoading ? (
-                        <Loader message="Loading optimized catalog records..." />
+                        <Loader message="Loading Products..." />
                     ) : allProductsFlat.length === 0 ? (
                         <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl bg-gray-50">
                             No products found matching the selected filter criteria.
@@ -295,7 +289,7 @@ const ProductsList = (props) => {
                     ) : (
                         <div>
                             <div className={`grid grid-cols-2 md:grid-cols-${props.gridColumns || 3} gap-4`}>
-                                {allProductsFlat.map((product) => {
+                                {allProductsFlat.map((product,index) => {
                                     const { id, name, category, variants, image_url } = product || {};
                                     const productVariants = variants || [];
                                     const finalImageUrl = image_url && image_url.trim() !== ""
@@ -318,7 +312,7 @@ const ProductsList = (props) => {
                                     };
 
                                     return (
-                                        <div key={id} className="relative group">
+                                        <div key={`${id}-${index}`} className="relative group">
                                             <div className="bg-white rounded-xl shadow-xs hover:shadow-md transition duration-200 p-4 flex flex-col justify-between h-full border border-gray-100">
                                                 <div>
                                                     <div className="relative overflow-hidden rounded-lg mb-3">
@@ -338,9 +332,6 @@ const ProductsList = (props) => {
                                                         >
                                                             <RemoveIcon fontSize="small" />
                                                         </button>
-                                                        {/* <span className="text-sm font-semibold text-gray-700 w-8 text-center select-none">
-                                                            {quantities[id] ?? 1}
-                                                        </span> */}
                                                         <input
                                                             type="text"
                                                             value={quantities[id] ?? 1}
@@ -348,7 +339,6 @@ const ProductsList = (props) => {
                                                             maxLength={3}
                                                             className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none"
                                                         />
-
                                                         <button
                                                             onClick={() => handleQuantityChange(id, 1)}
                                                             className="bg-secondary cursor-pointer w-8 h-8 flex items-center justify-center rounded shadow-2xs hover:bg-gray-50 active:scale-95 transition"
@@ -402,28 +392,19 @@ const ProductsList = (props) => {
                                 })}
                             </div>
 
-                            {/* --- THE INFINITE SPLIT PAGINATION TRIGGER --- */}
-                            {hasMore && !limit && (
-                                <div className="flex flex-col items-center justify-center mt-10 pt-4">
-                                    <button
-                                        onClick={handleLoadMore}
-                                        disabled={isLoading}
-                                        className="px-8 py-3 bg-primary btn-primary text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-primary disabled:bg-gray-200 disabled:text-gray-400 transition-all duration-150 cursor-pointer shadow-xs"
-                                    >
-                                        {isLoading ? 'Loading...' : 'Load More Products'}
-                                    </button>
-                                </div>
-                            )}
+                            {/* --- INFINITE SCROLL TARGET EYE --- */}
 
-                            {/* {isLoading && allProductsFlat.length > 0 && (
-                                <div className="text-center py-4 text-xs text-gray-400 animate-pulse">
-                                    Updating produc...
-                                </div>
-                            )} */}
+                            <div ref={observerTarget} className="w-full flex justify-center mt-8 min-h-[40px]">
+                                {isLoading && allProductsFlat.length > 0 && (
+                                    <div className="text-center text-xs text-gray-400 animate-pulse">
+                                        Loading more products...
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    )}
+                    )
+                    }
                 </div>
-
             </div>
         </div>
     );
