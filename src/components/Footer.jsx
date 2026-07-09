@@ -30,7 +30,7 @@ const Footer = () => {
                             <h4 className="ftr-head">CUSTOMER SERVICE</h4>
                             <ul className="space-y-3">
                                 <li><Link to="/sustainability-report" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Contact Us</Link></li>
-                                <li><Link to="/wholesale" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Suggestion/ Feedback</Link></li>
+                                <li><Link to="/terms-conditions" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Terms & Conditions</Link></li>
                                 <li><Link to="/refund-policy" className="font-body-md text-on-primary-fixed-variant hover:text-secondary-fixed hover:translate-x-1 inline-block transition-transform duration-200 hover:underline underline-offset-4">Returns Policy</Link></li>
                             </ul>
                         </div>

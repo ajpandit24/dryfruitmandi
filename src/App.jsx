@@ -18,6 +18,8 @@ import CategoriesPage from "./pages/CategoriesPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import ShippingPolicy from "./pages/ShippingPolicy";
+import TermsConditions from "./pages/TermsConditions";
+import NotFound from "./pages/NotFound";
 
 function App() {
 
@@ -33,6 +35,7 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
+          <Route path='*' element={<NotFound />} />
           <Route path='/' element={<Home />} />
           <Route path='/about' element={<About />} />
           <Route path='/products' element={<Products />} />
@@ -43,6 +46,7 @@ function App() {
           <Route path='/privacy-policy' element={<PrivacyPolicy />} />
           <Route path='/refund-policy' element={<RefundPolicy />} />
           <Route path='/shipping-policy' element={<ShippingPolicy />} />
+          <Route path='/terms-conditions' element={<TermsConditions />} />
 
           <Route path='/cart' element={<CartPage />} />
         </Routes>
