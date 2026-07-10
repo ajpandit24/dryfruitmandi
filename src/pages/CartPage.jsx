@@ -7,6 +7,46 @@ import Loader from '../components/Loader';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
+import { z } from 'zod';
+
+const customerValidationSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters.")
+    .max(70, "Name is too long.")
+    .regex(/^[a-zA-Z\s.]+$/, "Name can only contain alphabetical letters, dots, and spaces."),
+  
+  email: z
+    .string()
+    .email("Please provide a valid structured email address (e.g., user@domain.com).")
+    .toLowerCase(),
+  
+  phone: z
+    .string()
+    .regex(/^(?:\+91|91)?[6-9]\d{9}$/, "Provide a valid 10-digit Indian mobile number (with optional 91 prefix)."),
+  
+  fssai: z
+    .string()
+    .regex(/^\d{14}$/, "FSSAI registration number must be exactly 14 digits."),
+  
+  gst: z
+    .string()
+    .toUpperCase()
+    .regex(/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$/, "Please input a valid 15-character GSTIN format."),
+  
+  address: z
+    .string()
+    .min(10, "Please specify a detailed complete address layout (min 10 chars).")
+    .max(500, "Address limits exceeded.")
+    .transform((val) => {
+      // SECURITY: Sanitize malicious script tags / HTML injections
+      return val
+        .replace(/<[^>]*>/g, '') // Strips HTML elements
+        .replace(/[&<>"']/g, (m) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;'
+        })[m]);
+    })
+});
 
 export default function CartPage() {
   const dispatch = useDispatch();
@@ -20,8 +60,12 @@ export default function CartPage() {
     name: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    fssai: '',
+    gst: '',
   });
+
+  const [errors, setErrors] = useState({});
 
   const API_URL = import.meta.env?.VITE_API_URL;
 
@@ -31,6 +75,10 @@ export default function CartPage() {
       ...prev,
       [name]: value
     }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
   };
 
   const handleIncreaseQty = (item) => {
@@ -49,11 +97,19 @@ export default function CartPage() {
   const handleShowConfirmation = (e) => {
     e.preventDefault();
 
-    if (!customer.name || !customer.email || !customer.phone || !customer.address) {
-      alert("Please fill out all details including address before placing your order.");
+    const customerErrors = customerValidationSchema.safeParse(customer);
+
+    if (!customerErrors.success) {
+      const formattedErrors = {};
+      customerErrors.error.issues.forEach((issue) => {
+        formattedErrors[issue.path[0]] = issue.message;
+      });
+      setErrors(formattedErrors);
       return;
     }
 
+    setCustomer(customerErrors.data);
+    setErrors({});
     setShowConfirmationModal(true);
   };
 
@@ -75,6 +131,8 @@ export default function CartPage() {
       phone: customerFormData.phone,
       email: customerFormData.email,
       address: customerFormData.address,
+      fssai: customerFormData.fssai,
+      gst: customerFormData.gst,
       // Combine cart details neatly for the spreadsheet cell
       details: cartItems.map(item => `${item.quantity}x ${item.name} (${item.variant?.weight})`).join('\n'),
       total: `₹${totalAmount}`
@@ -113,7 +171,7 @@ export default function CartPage() {
   const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (!customer.name || !customer.email || !customer.phone || !customer.address) {
+    if (!customer.name || !customer.email || !customer.phone || !customer.fssai || !customer.gst || !customer.address) {
       alert("Please fill out all details including address before placing your order.");
       return;
     }
@@ -267,35 +325,61 @@ export default function CartPage() {
               value={customer.name}
               onChange={handleInputChange}
               placeholder="Enter your full name"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className={`w-full px-3 py-2 border ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'} rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm`}
             />
+            {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
             <input
-              type="email"
+              type="text"
               name="email"
               value={customer.email}
               onChange={handleInputChange}
               placeholder="name@example.com"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'} rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm`}
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">WhatsApp Number</label>
             <input
-              type="tel"
+              type="text"
               name="phone"
               value={customer.phone}
               onChange={handleInputChange}
-              placeholder="e.g., 919876543210"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              placeholder="e.g., 9876543210"
+              className={`w-full px-3 py-2 border ${errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'} rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm`}
             />
+            {errors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{errors.phone}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">FSSAI Number</label>
+            <input
+              type="text"
+              name="fssai"
+              value={customer.fssai}
+              onChange={handleInputChange}
+              placeholder="14-digit FSSAI number"
+              className={`w-full px-3 py-2 border ${errors.fssai ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'} rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm`}
+            />
+            {errors.fssai && <p className="text-red-500 text-xs mt-1 font-medium">{errors.fssai}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">GST Number</label>
+            <input
+              type="text"
+              name="gst"
+              value={customer.gst}
+              onChange={handleInputChange}
+              placeholder="15-character GSTIN"
+              className={`w-full px-3 py-2 border ${errors.gst ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'} rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm`}
+            />
+            {errors.gst && <p className="text-red-500 text-xs mt-1 font-medium">{errors.gst}</p>}
           </div>
 
           <div>
@@ -304,18 +388,14 @@ export default function CartPage() {
               name="address"
               value={customer.address}
               onChange={handleInputChange}
-              placeholder="Enter your complete delivery address"
-              required
+              placeholder="Enter complete delivery address"
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm resize-none"
+              className={`w-full px-3 py-2 border ${errors.address ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'} rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm resize-none`}
             />
+            {errors.address && <p className="text-red-500 text-xs mt-1 font-medium">{errors.address}</p>}
           </div>
 
           <div className="border-t border-gray-200 my-4 pt-4 space-y-2">
-            {/* <div className="flex justify-between items-center text-gray-600">
-              <span>Subtotal:</span>
-              <span className="font-medium text-gray-900">₹{totalAmount}</span>
-            </div> */}
             <div className="flex justify-between items-center text-gray-600">
               <span>Delivery Charges:</span>
               <span className="text-sm text-green-600 font-medium">Free</span>
@@ -329,16 +409,15 @@ export default function CartPage() {
 
           <button
             type="submit"
-            className="cursor-pointer w-full bg-primary hover:bg-secondary text-white py-3 px-4 rounded-md font-bold text-center transition-colors shadow-md flex items-center justify-center gap-2 mt-4"
+            className="cursor-pointer w-full bg-primary text-white py-3 px-4 rounded-md font-bold text-center transition-colors shadow-md flex items-center justify-center gap-2 mt-4"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Placing order...' : 'Place Order'}
           </button>
           {isSubmitting && <Loader message="Submitting order..." />}
         </form>
-
-
       </div>
+
       <OrderConfirmationModal
         isOpen={showConfirmationModal}
         onClose={() => setShowConfirmationModal(false)}

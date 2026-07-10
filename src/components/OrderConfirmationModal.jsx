@@ -73,6 +73,8 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                             <div><strong>Name:</strong> {orderData.customer.name}</div>
                             <div><strong>Email:</strong> {orderData.customer.email}</div>
                             <div><strong>Phone:</strong> {orderData.customer.phone}</div>
+                            <div><strong>FSSAI:</strong> {orderData.customer.fssai}</div>
+                            <div><strong>GST:</strong> {orderData.customer.gst}</div>
                             <div><strong>Delivery Address:</strong></div>
                             <div className="ml-0 p-3 bg-gray-100 rounded border border-gray-300 whitespace-pre-wrap text-gray-800">
                                 {orderData.customer.address}
