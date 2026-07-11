@@ -35,21 +35,21 @@ const Home = ({menuData}) => {
             <section className='container'>
                 <h1 className='section-heading'>Shop By Category</h1>
 
-                <Categories menuData={menuData} limit={6} />
+                <Categories menuData={menuData} />
 
-                <div className='text-center'>
+                {/* <div className='text-center'>
                     <Link to='/categories' className='btn mt-6 bg-primary px-4 py-2 rounded'>View All Categories</Link>
-                </div>
+                </div> */}
             </section>
 
-            <section className='container mt-12'>
+            {/* <section className='container mt-12'>
                 <h1 className='section-heading'>Featured Products</h1>
                 <ProductsList limit={4} gridColumns={4} />
 
                 <div className='text-center'>
                     <Link to='/products' className='btn mt-6 bg-primary px-4 py-2 rounded'>View All Products</Link>
                 </div>
-            </section>
+            </section> */}
 
             {/* <section className='container mt-12'>
                 <h1 className='section-heading'>Latest Blogs</h1>

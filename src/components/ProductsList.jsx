@@ -396,7 +396,7 @@ const ProductsList = (props) => {
 
                             <div ref={observerTarget} className="w-full flex justify-center mt-8 min-h-[40px]">
                                 {isLoading && allProductsFlat.length > 0 && (
-                                    <div className="text-center text-xs text-gray-400 animate-pulse">
+                                    <div className="text-center text-xs text-primary animate-pulse">
                                         Loading more products...
                                     </div>
                                 )}
