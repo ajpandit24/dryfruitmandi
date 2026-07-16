@@ -5,6 +5,13 @@ import { Link } from 'react-router-dom'
 const Footer = () => {
     return (
         <div>
+            <div className="footer-top bg-secondary border-secondary w-full pt-4 pb-2">
+                <div className="footer-note container">
+
+                    <p className='text-center'><b> Shopkeer, trader, hotel, restaurant & caterers can purchase from this website, FSSAI number compulsory to purchase, <br /> for more details read terms & conditions below</b></p>
+                </div>
+            </div>  
+
             <footer className="bg-primary border-t-2 border-secondary w-full pt-16 pb-8">
                 <div className="container mx-auto">
                     <div className="gap-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-gutter px-margin-desktop max-w-max-width mx-auto">
@@ -37,8 +44,8 @@ const Footer = () => {
                         <div className="col-span-1 lg:col-span-2">
                             <h4 className="ftr-head">CONTACT US</h4>
                             <ul className="space-y-3">
-                                <li>K-53, Mudi Bazar, Phase-II Market-1, Sector-19,<br/>
-                    Vashi APMC, Navi Mumbai - 400703<br/></li>
+                                <li>K-53, Mudi Bazar, Phase-II Market-1, Sector-19,<br />
+                                    Vashi APMC, Navi Mumbai - 400703<br /></li>
                                 <li>Phone: 720860 7196</li>
                                 <li>Email: <a href="mailto:info@dryfruitsmandi.com" className="text-secondary-fixed hover:text-primary-fixed">info@dryfruitsmandi.com</a></li>
                             </ul>

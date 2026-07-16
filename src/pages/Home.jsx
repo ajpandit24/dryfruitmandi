@@ -3,7 +3,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { A11y, Pagination } from 'swiper/modules';
-import slide1 from '../assets/slider1.jpg'
+import slide1 from '../assets/banner1.jpg'
+import slide2 from '../assets/banner2.jpg'
 import ProductsList from '../components/ProductsList';
 import BlogListing from '../components/BlogsListing';
 import { Link } from 'react-router-dom';
@@ -27,7 +28,7 @@ const Home = ({menuData}) => {
                     <img src={slide1} alt='slide' />
                 </SwiperSlide>
                 <SwiperSlide>
-                    <img src={slide1} alt='slide' />
+                    <img src={slide2} alt='slide' />
                 </SwiperSlide>
             </Swiper>
 
