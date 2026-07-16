@@ -213,7 +213,7 @@ const ProductsList = (props) => {
 
                 {/* --- LEFT SIDEBAR ACCORDION FILTERS --- */}
                 {tabs && (
-                    <div className="w-full md:w-64 bg-white border border-gray-200 rounded-xl p-4 shrink-0 shadow-xs sticky top-24">
+                    <div className="w-full md:w-64 bg-white border border-gray-200 rounded-xl p-4 shrink-0 shadow-xs md:sticky top-24">
                         <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 pb-3 px-1">
                             Categories
                         </h3>
@@ -289,7 +289,7 @@ const ProductsList = (props) => {
                     ) : (
                         <div>
                             <div className={`grid grid-cols-2 md:grid-cols-${props.gridColumns || 3} gap-4`}>
-                                {allProductsFlat.map((product,index) => {
+                                {allProductsFlat.map((product, index) => {
                                     const { id, name, category, variants, image_url } = product || {};
                                     const productVariants = variants || [];
                                     const finalImageUrl = image_url && image_url.trim() !== ""
@@ -301,6 +301,12 @@ const ProductsList = (props) => {
 
                                     if (!activeVariant) return null;
 
+                                    const base = activeVariant.price || 0;
+                                    const apmc = parseFloat(product.apmc || "0") / 100;
+                                    const gst = parseFloat(product.gst || "0") / 100;
+
+                                    const finalPrice = (base * (1 + apmc)) * (1 + gst);
+
                                     const cartItem = {
                                         id: id,
                                         name: name,
@@ -308,7 +314,8 @@ const ProductsList = (props) => {
                                         quantity: quantities[id] ?? 1,
                                         gst: product.gst || "0",
                                         apmc: product.apmc || "0",
-                                        totalprice: activeVariant.price + (activeVariant.price * (parseFloat(product.gst || "0") / 100)) + (activeVariant.price * (parseFloat(product.apmc || "0") / 100))
+                                        totalprice: finalPrice,
+                                            // activeVariant.price + (activeVariant.price * (parseFloat(product.gst || "0") / 100)) + (activeVariant.price * (parseFloat(product.apmc || "0") / 100))
                                     };
 
                                     return (
