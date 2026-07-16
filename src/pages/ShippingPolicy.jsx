@@ -1,9 +1,11 @@
 import React from 'react'
 
 const ShippingPolicy = () => {
+    
+
     return (
         <div>
-            <div className="widget widget-text-heading left">
+            <div className="container policy py-8">
                 <p>Last Updated: May 2026</p>
 
                 <p>
@@ -12,9 +14,9 @@ const ShippingPolicy = () => {
                     safely and efficiently to our customers across India.
                 </p>
 
-                <h2>Order Processing</h2>
+                <h2 className='text-xl font-bold pb-4'>Order Processing</h2>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>
                         Orders are processed within <strong>1–2 business days</strong> after
                         payment confirmation.
@@ -29,7 +31,7 @@ const ShippingPolicy = () => {
                     </li>
                 </ul>
 
-                <h2>Shipping Coverage</h2>
+                <h2 className='text-xl font-bold pb-4'>Shipping Coverage</h2>
 
                 <p>
                     We currently ship across <strong>India</strong> through trusted courier and
@@ -38,43 +40,43 @@ const ShippingPolicy = () => {
 
                 <h2>Minimum Order Value</h2>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>
                         We accept orders with a minimum cart value of <strong>₹2,000</strong>.
                     </li>
                 </ul>
 
-                <h2>Delivery Timeline</h2>
+                <h2 className='text-xl font-bold pb-4'>Delivery Timeline</h2>
 
                 <p>Estimated delivery timelines:</p>
 
                 <div className="TyagGW_tableContainer">
                     <div
-                        className="group TyagGW_tableWrapper flex flex-col-reverse w-fit"
+                        className="group TyagGW_tableWrapper w-fit"
                         tabIndex={-1}
                     >
-                        <table className="w-fit min-w-(--thread-content-width)">
+                        <table className="table mb-4 w-fit min-w-(--thread-content-width)">
                             <thead>
                                 <tr>
-                                    <th>Location</th>
+                                    <th className='pe-4 text-left'>Location</th>
                                     <th>Estimated Delivery Time</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Mumbai &amp; Navi Mumbai</td>
+                                    <td className='pe-4'>Mumbai &amp; Navi Mumbai</td>
                                     <td>1–3 Business Days</td>
                                 </tr>
                                 <tr>
-                                    <td>Maharashtra</td>
+                                    <td className='pe-4'>Maharashtra</td>
                                     <td>2–5 Business Days</td>
                                 </tr>
                                 <tr>
-                                    <td>Major Metro Cities</td>
+                                    <td className='pe-4'>Major Metro Cities</td>
                                     <td>3–7 Business Days</td>
                                 </tr>
                                 <tr>
-                                    <td>Other Locations in India</td>
+                                    <td className='pe-4'>Other Locations in India</td>
                                     <td>4–10 Business Days</td>
                                 </tr>
                             </tbody>
@@ -87,9 +89,9 @@ const ShippingPolicy = () => {
                     weather conditions, remote locations, or unforeseen circumstances.
                 </p>
 
-                <h2>Shipping Charges</h2>
+                <h2 className='text-xl font-bold pb-4'>Shipping Charges</h2>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>
                         Shipping charges will be calculated during checkout based on order value,
                         weight, and delivery location.
@@ -100,11 +102,11 @@ const ShippingPolicy = () => {
                     </li>
                 </ul>
 
-                <h2>Order Tracking</h2>
+                <h2 className='text-xl font-bold pb-4'>Order Tracking</h2>
 
                 <p>Once your order is shipped, tracking details will be shared via:</p>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>Email</li>
                     <li>SMS</li>
                     <li>WhatsApp (where applicable)</li>
@@ -114,18 +116,18 @@ const ShippingPolicy = () => {
                     Customers can use the tracking number to monitor their shipment status.
                 </p>
 
-                <h2>Packaging</h2>
+                <h2 className='text-xl font-bold pb-4'>Packaging</h2>
 
                 <p>
                     All products are packed carefully to maintain freshness, quality, and
                     hygiene standards during transit.
                 </p>
 
-                <h2>Delayed or Failed Deliveries</h2>
+                <h2 className='text-xl font-bold pb-4'>Delayed or Failed Deliveries</h2>
 
                 <p>Delivery may be delayed due to:</p>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>Incorrect shipping address</li>
                     <li>Customer unavailable during delivery attempts</li>
                     <li>Natural disasters, strikes, or logistics disruptions</li>
@@ -137,11 +139,11 @@ const ShippingPolicy = () => {
                     the issue.
                 </p>
 
-                <h2>Damaged or Missing Items</h2>
+                <h2 className='text-xl font-bold pb-4'>Damaged or Missing Items</h2>
 
                 <p>If you receive:</p>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>A damaged package</li>
                     <li>A tampered package</li>
                     <li>Missing items</li>
@@ -151,7 +153,7 @@ const ShippingPolicy = () => {
                     Please contact us within <strong>24 hours of delivery</strong> with:
                 </p>
 
-                <ul>
+                <ul className="list-disc list-inside mb-8">
                     <li>Order Number</li>
                     <li>Product Photos</li>
                     <li>Package Photos</li>
@@ -159,7 +161,7 @@ const ShippingPolicy = () => {
 
                 <p>Our team will investigate and provide a suitable resolution.</p>
 
-                <h2>Incorrect Shipping Information</h2>
+                <h2 className='text-xl font-bold pb-4'>Incorrect Shipping Information</h2>
 
                 <p>
                     Customers are responsible for providing accurate shipping details. Dry
@@ -167,7 +169,7 @@ const ShippingPolicy = () => {
                     incorrect addresses or contact information provided by the customer.
                 </p>
 
-                <h2>Contact Us</h2>
+                <h2 className='text-xl font-bold pb-4'>Contact Us</h2>
 
                 <p>For shipping-related queries, contact:</p>
 

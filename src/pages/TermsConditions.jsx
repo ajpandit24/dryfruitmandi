@@ -2,7 +2,7 @@ import React from 'react';
 
 const TermsConditions = () => {
     return (
-        <section className="container">
+        <section className="policy container">
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                 <div className='col-span-2'>
                     <h2 className='text-xl font-bold pb-4'>Terms and Conditions</h2>

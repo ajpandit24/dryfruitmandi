@@ -112,7 +112,7 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                                 <strong>Account Holder Name:</strong> Ananya Enterprises
                             </div>
                             <div>
-                                <strong>Bank Account Name:</strong> Kotak Mahindra Bank
+                                <strong>Bank Name:</strong> Kotak Mahindra Bank
                             </div>
                             <div>
                                 <strong>Account Number:</strong> 0246207621
@@ -121,7 +121,7 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                                 <strong>IFSC Routing Code:</strong> KKBK0001370
                             </div>
                             <div>
-                                <strong>Account Type:</strong> Current Account (Vashi Branch)
+                                <strong>Branch:</strong> APMC Masala Market
                             </div>
                             <div className="mt-3 p-3 bg-yellow-100 rounded border border-yellow-300">
                                 <strong className="text-primary">GPay / PhonePe:</strong>
