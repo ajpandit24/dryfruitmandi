@@ -284,30 +284,34 @@ const ProductsList = (props) => {
                             <div className={`grid grid-cols-2 md:grid-cols-${props.gridColumns || 3} gap-4`}>
                                 {allProductsFlat.map((product, index) => {
                                     const { id, name, category, variants, image_url } = product || {};
-                                    const productVariants = variants || [];
+                                    const productVariants = Array.isArray(variants) ? variants : [];
                                     const finalImageUrl = image_url && image_url.trim() !== ""
                                         ? image_url
                                         : 'https://dummyimage.com/550x700/f5f5f5/000';
 
-                                    const activeIndex = selectedVariantIndexes[id] ?? 0;
-                                    const activeVariant = productVariants.length > 0 ? productVariants[activeIndex] || productVariants[0] : null;
+                                    // 1. Correctly read active variant index for THIS product
+                                    const activeIndex = selectedVariantIndexes[id] !== undefined ? selectedVariantIndexes[id] : 0;
+                                    const activeVariant = productVariants[activeIndex] || productVariants[0] || {};
 
-                                    if (!activeVariant) return null;
+                                    // 2. Fallback check if product has no valid variants
+                                    if (!activeVariant || Object.keys(activeVariant).length === 0) return null;
 
-                                    const base = activeVariant.price || 0;
+                                    // 3. Dynamic pricing based on CURRENT ACTIVE VARIANT
+                                    const basePrice = parseFloat(activeVariant.price || "0");
                                     const apmc = parseFloat(product.apmc || "0") / 100;
                                     const gst = parseFloat(product.gst || "0") / 100;
 
-                                    const finalPrice = (base * (1 + apmc)) * (1 + gst);
+                                    const finalUnitPrice = (basePrice * (1 + apmc)) * (1 + gst);
+                                    const selectedQty = quantities[id] ?? 1;
 
                                     const cartItem = {
                                         id: id,
                                         name: name,
                                         variant: activeVariant,
-                                        quantity: quantities[id] ?? 1,
+                                        quantity: selectedQty,
                                         gst: product.gst || "0",
                                         apmc: product.apmc || "0",
-                                        totalprice: finalPrice,
+                                        totalprice: finalUnitPrice * selectedQty,
                                     };
 
                                     return (
@@ -323,24 +327,27 @@ const ProductsList = (props) => {
                                                         </span>
                                                     </div>
 
+                                                    {/* Quantity Controls */}
                                                     <div className="flex items-center justify-between bg-gray-100 rounded-md p-1 mb-2">
                                                         <button
+                                                            type="button"
                                                             onClick={() => handleQuantityChange(id, -1)}
-                                                            className="w-8 h-8 flex items-center justify-center rounded bg-secondary cursor-pointer shadow-2xs active:scale-95 transition"
+                                                            className="w-8 h-8 flex items-center justify-center rounded bg-white cursor-pointer shadow-2xs active:scale-95 transition"
                                                             aria-label="Decrease quantity"
                                                         >
                                                             <RemoveIcon fontSize="small" />
                                                         </button>
                                                         <input
                                                             type="text"
-                                                            value={quantities[id] ?? 1}
+                                                            value={selectedQty}
                                                             onChange={(e) => setQuantities((prev) => ({ ...prev, [id]: parseInt(e.target.value, 10) || 1 }))}
                                                             maxLength={3}
-                                                            className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none"
+                                                            className="w-14 py-1.5 border-t border-b border-gray-200 text-center text-sm font-semibold focus:outline-none bg-transparent"
                                                         />
                                                         <button
+                                                            type="button"
                                                             onClick={() => handleQuantityChange(id, 1)}
-                                                            className="bg-secondary cursor-pointer w-8 h-8 flex items-center justify-center rounded shadow-2xs hover:bg-gray-50 active:scale-95 transition"
+                                                            className="w-8 h-8 flex items-center justify-center rounded bg-white cursor-pointer shadow-2xs active:scale-95 transition"
                                                             aria-label="Increase quantity"
                                                         >
                                                             <AddIcon fontSize="small" />
@@ -351,9 +358,10 @@ const ProductsList = (props) => {
                                                         <Link to={`/products/${id}`}>{name}</Link>
                                                     </h2>
 
-                                                    <div className="flex items-baseline justify-between gap-1 mt-2 mb-3 bg-gray-50/50 p-2 rounded-md">
+                                                    {/* Price Display */}
+                                                    <div className="flex items-baseline justify-between gap-1 mt-2 mb-3 bg-gray-50 p-2 rounded-md">
                                                         <p className="mb-0 font-bold text-gray-900 text-base">₹{activeVariant.price}</p>
-                                                        <p className="bg-primary text-white p-1 mb-0 text-xs font-medium">
+                                                        <p className="bg-primary text-white px-1.5 py-0.5 mb-0 text-xs font-medium rounded">
                                                             {(() => {
                                                                 const { formattedPrice, label } = getWeightDisplayDetails(activeVariant?.weight, activeVariant?.price);
                                                                 return <span>₹{formattedPrice}/{label}</span>;
@@ -361,24 +369,32 @@ const ProductsList = (props) => {
                                                         </p>
                                                     </div>
 
+                                                    {/* Variant Pills Selector */}
                                                     <ul className="flex gap-1.5 flex-wrap my-3 min-h-[1.75rem]">
-                                                        {productVariants.map((v, idx) => (
-                                                            <li
-                                                                key={idx}
-                                                                className={`cursor-pointer px-2 py-0.5 rounded-sm text-[11px] border transition font-medium ${idx === activeIndex
-                                                                    ? 'bg-primary text-white border-primary'
-                                                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                                    }`}
-                                                                onClick={() => handleVariantSelect(id, idx)}
-                                                            >
-                                                                {v.weight}
-                                                            </li>
-                                                        ))}
+                                                        {productVariants.map((v, idx) => {
+                                                            const isSelected = idx === activeIndex;
+                                                            return (
+                                                                <li
+                                                                    key={`${id}-variant-${idx}`}
+                                                                    className={`cursor-pointer px-2.5 py-1 rounded text-[11px] border transition font-medium select-none ${isSelected
+                                                                        ? 'bg-primary text-white border-primary shadow-2xs'
+                                                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-100'
+                                                                        }`}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleVariantSelect(id, idx);
+                                                                    }}
+                                                                >
+                                                                    {v.weight || `Variant ${idx + 1}`}
+                                                                </li>
+                                                            );
+                                                        })}
                                                     </ul>
                                                 </div>
 
                                                 <div className="mt-auto space-y-2.5 pt-2 border-t border-gray-50">
                                                     <button
+                                                        type="button"
                                                         onClick={() => dispatch(addToCart(cartItem))}
                                                         className="w-full btn-primary text-white text-xs font-semibold py-2.5 rounded-md shadow-xs active:scale-[0.99] transition cursor-pointer"
                                                     >
