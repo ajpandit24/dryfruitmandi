@@ -34,25 +34,30 @@ const ProductsList = (props) => {
     const observerTarget = useRef(null);
 
     // ==========================================
-    // EFFECT 1: FETCH CATEGORIES (FIXED DUPLICATION)
+    // EFFECT 1: FETCH ALL CATEGORIES & SUBCATEGORIES
     // ==========================================
     useEffect(() => {
-        const initializeCategoriesAndData = async () => {
+        const fetchAllCategories = async () => {
             try {
-                const response = await fetch(`${API_URL}/products?page=1&limit=500`);
+                // Request a large enough limit to cover all items or hit a dedicated category endpoint
+                const response = await fetch(`${API_URL}/products?page=1&limit=1000`);
                 const json = await response.json();
 
-                if (json.success && json.data) {
+                if (json.success && Array.isArray(json.data)) {
                     const structuralMap = {};
                     json.data.forEach(p => {
-                        if (!structuralMap[p.category]) {
-                            structuralMap[p.category] = {
-                                category_name: p.category,
-                                category_image: p.image_url,
-                                subcategories: {}
-                            };
+                        if (p.category) {
+                            if (!structuralMap[p.category]) {
+                                structuralMap[p.category] = {
+                                    category_name: p.category,
+                                    category_image: p.image_url || '',
+                                    subcategories: {}
+                                };
+                            }
+                            if (p.sub_category) {
+                                structuralMap[p.category].subcategories[p.sub_category] = true;
+                            }
                         }
-                        structuralMap[p.category].subcategories[p.sub_category] = [];
                     });
                     setNestedData(structuralMap);
                 }
@@ -62,32 +67,39 @@ const ProductsList = (props) => {
         };
 
         if (tabs) {
-            initializeCategoriesAndData();
+            fetchAllCategories();
         }
     }, [tabs, API_URL]);
 
     // ==========================================
-    // CORE FUNCTION: REQUEST CHUNKS FROM API
+    // CORE FUNCTION: REQUEST PAGINATED PRODUCTS
     // ==========================================
-    const loadProductChunk = useCallback(async (pageNum, cat, subCat, isNewFilter = false) => {
+    const loadProductChunk = useCallback(async (
+        pageNum,
+        cat,
+        subCat,
+        isNewFilter = false
+    ) => {
         setIsLoading(true);
         try {
             const requestLimit = limit || 12;
             let url = `${API_URL}/products?page=${pageNum}&limit=${requestLimit}`;
 
-            if (cat) url += `&category=${encodeURIComponent(cat)}`;
-            if (subCat) url += `&subcategory=${encodeURIComponent(subCat)}`;
+            if (cat && cat !== 'All') {
+                url += `&category=${encodeURIComponent(cat)}`;
+            }
+            if (subCat && subCat !== 'All') {
+                url += `&subcategory=${encodeURIComponent(subCat)}`;
+            }
 
             const response = await fetch(url);
             const json = await response.json();
 
-            if (json.success && json.data) {
-                // Deduplicate items automatically by tracking unique product IDs
+            if (json.success && Array.isArray(json.data)) {
                 setAllProductsFlat(prev => {
                     const incomingData = isNewFilter ? json.data : [...prev, ...json.data];
-
-                    // Use a Map to keep only the first occurrence of any product ID
                     const uniqueMap = new Map();
+
                     incomingData.forEach(item => {
                         if (item && item.id) {
                             uniqueMap.set(item.id, item);
@@ -97,29 +109,16 @@ const ProductsList = (props) => {
                     return Array.from(uniqueMap.values());
                 });
 
-                setHasMore(json.pagination.hasMore);
-
-                if (isNewFilter && Object.keys(nestedData).length === 0) {
-                    const structuralMap = {};
-                    json.data.forEach(p => {
-                        if (!structuralMap[p.category]) {
-                            structuralMap[p.category] = {
-                                category_name: p.category,
-                                category_image: p.image_url,
-                                subcategories: {}
-                            };
-                        }
-                        structuralMap[p.category].subcategories[p.sub_category] = [];
-                    });
-                    setNestedData(prev => Object.keys(prev).length === 0 ? structuralMap : prev);
+                if (json.pagination) {
+                    setHasMore(json.pagination.hasMore);
                 }
             }
         } catch (error) {
-            console.error("Error loading optimized data slice chunk:", error);
+            console.error("Error loading product data chunk:", error);
         } finally {
             setIsLoading(false);
         }
-    }, [limit, API_URL, nestedData]);
+    }, [limit, API_URL]);
 
     // ==========================================
     // EFFECT 2: RESET LIST WHEN FILTERS ALTER
@@ -133,14 +132,9 @@ const ProductsList = (props) => {
     // ==========================================
     // EFFECT 3: INFINITE SCROLL OBSERVER
     // ==========================================
-    // ==========================================
-    // EFFECT 3: INFINITE SCROLL OBSERVER (FIXED DOUBLE FETCH)
-    // ==========================================
     useEffect(() => {
         const target = observerTarget.current;
 
-        // CRITICAL GUARD: Stop observer if there's nothing more to fetch,
-        // if a network request is active, or if we are currently wiping/resetting the list.
         if (!target || !hasMore || isLoading || limit || allProductsFlat.length === 0) return;
 
         const observer = new IntersectionObserver((entries) => {
@@ -152,7 +146,7 @@ const ProductsList = (props) => {
                 });
             }
         }, {
-            rootMargin: '200px', // Pre-fetch next row before hitting the absolute bottom
+            rootMargin: '200px',
             threshold: 0
         });
 
@@ -162,7 +156,6 @@ const ProductsList = (props) => {
             if (target) observer.unobserve(target);
         };
     }, [hasMore, isLoading, activeCategory, activeSubcategory, loadProductChunk, limit, allProductsFlat.length]);
-
 
     const [selectedVariantIndexes, setSelectedVariantIndexes] = useState({});
     const [quantities, setQuantities] = useState({});
@@ -315,7 +308,6 @@ const ProductsList = (props) => {
                                         gst: product.gst || "0",
                                         apmc: product.apmc || "0",
                                         totalprice: finalPrice,
-                                            // activeVariant.price + (activeVariant.price * (parseFloat(product.gst || "0") / 100)) + (activeVariant.price * (parseFloat(product.apmc || "0") / 100))
                                     };
 
                                     return (
@@ -400,7 +392,6 @@ const ProductsList = (props) => {
                             </div>
 
                             {/* --- INFINITE SCROLL TARGET EYE --- */}
-
                             <div ref={observerTarget} className="w-full flex justify-center mt-8 min-h-[40px]">
                                 {isLoading && allProductsFlat.length > 0 && (
                                     <div className="text-center text-xs text-primary animate-pulse">
@@ -409,8 +400,7 @@ const ProductsList = (props) => {
                                 )}
                             </div>
                         </div>
-                    )
-                    }
+                    )}
                 </div>
             </div>
         </div>
