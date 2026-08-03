@@ -138,6 +138,7 @@ const OrderConfirmationModal = ({ isOpen, onClose, onProceed, orderData, totalAm
                             <li>Any shortage/damage should be reported within 24 hours of delivery.</li>
                             <li>Interest at 18% p.a. is applicable on delayed payments.</li>
                             <li>Subject to Navi Mumbai Jurisdiction.</li>
+                            <li>Delivery charges are extra and payable by the customer.</li>
                         </ol>
                         <p className="text-xs text-gray-500 mt-3 italic">
                             Declaration: This automated summary acts as our formal order evaluation document. Thank you for your business.
