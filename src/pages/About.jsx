@@ -1,6 +1,8 @@
 import React from 'react'
 import slide1 from '../assets/slider1.jpg'
 
+import dummyProduct from '../assets/dummy-product.png';
+
 const About = () => {
   return (
     <section className="container">
@@ -17,7 +19,7 @@ const About = () => {
         </div>
 
         <div className='col-span-1'>
-          <img src="https://dummyimage.com/550x400/420e57/fff" alt="About Us" />
+          <img src={dummyProduct} alt="About Us" />
         </div>
       </div>
 

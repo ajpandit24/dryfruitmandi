@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import { setCategoryFilter, clearFilters } from '../redux/filterSlice';
 import Loader from './Loader';
+import dummyProduct from '../assets/dummy-product.png';
 
 const ProductsList = (props) => {
     const { limit, tabs } = props;
@@ -287,7 +288,7 @@ const ProductsList = (props) => {
                                     const productVariants = Array.isArray(variants) ? variants : [];
                                     const finalImageUrl = image_url && image_url.trim() !== ""
                                         ? image_url
-                                        : 'https://dummyimage.com/550x700/f5f5f5/000';
+                                        : dummyProduct;
 
                                     // 1. Correctly read active variant index for THIS product
                                     const activeIndex = selectedVariantIndexes[id] !== undefined ? selectedVariantIndexes[id] : 0;

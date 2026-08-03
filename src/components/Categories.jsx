@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCategoryFilter } from '../redux/filterSlice';
+import dummyProduct from '../assets/dummy-product.png';
 
 export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCategoryImage }) => {
     const dispatch = useDispatch();
@@ -12,7 +13,7 @@ export const SubcategoryCard = ({ subCategoryName, parentCategoryName, subCatego
         navigate(`/products?category=${encodeURIComponent(parentCategoryName)}&subcategory=${encodeURIComponent(subCategoryName)}`);
     };
 
-    const fallbackImage = 'https://dummyimage.com/300x300/f5f5f5/a3a3a3&text=Ananya+Enterprises';
+    const fallbackImage = {dummyProduct};
 
     return (
         <div 
@@ -53,15 +54,20 @@ const Categories = ({ limit }) => {
             const categoryObj = menuData[parentCatName] || {};
             const subcategoriesObj = categoryObj.subcategories || {};
             const subKeys = Object.keys(subcategoriesObj);
+            
 
             if (subKeys.length > 0) {
                 subKeys.forEach((subCatName) => {
                     const subData = subcategoriesObj[subCatName];
+                    const subcategoryImage = subData?.subcategory_image?.trim();
+                    const categoryImage = categoryObj?.category_image?.trim();
+                    const fallbackImage = subcategoryImage || categoryImage || dummyProduct;
+
                     flatSubcategories.push({
                         subCategoryName: subCatName,
                         parentCategoryName: parentCatName,
                         // Fallback order: Explicit subcategory_image -> parent category_image -> null fallback
-                        image: subData?.subcategory_image || categoryObj?.category_image
+                        image: fallbackImage
                     });
                 });
             } else {

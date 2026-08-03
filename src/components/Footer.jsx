@@ -8,7 +8,7 @@ const Footer = () => {
             <div className="footer-top bg-secondary border-secondary w-full pt-4 pb-2">
                 <div className="footer-note container">
 
-                    <p className='text-center'><b> Shopkeer, trader, hotel, restaurant & caterers can purchase from this website, FSSAI number compulsory to purchase, <br /> for more details read terms & conditions below</b></p>
+                    <p className='text-center'><b> Shopkeer, trader, hotel, restaurant & caterers can purchase from this website, FSSAI number compulsory to purchase, Delivery charges are extra and payable by the customer. <br /> For more details read terms & conditions below</b></p>
                 </div>
             </div>  
 
