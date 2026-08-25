@@ -398,7 +398,7 @@ export default function CartPage() {
           <div className="border-t border-gray-200 my-4 pt-4 space-y-2">
             <div className="flex justify-between items-center text-gray-600">
               <span>Delivery Charges:</span>
-              <span className="text-sm text-green-600 font-medium">Free</span>
+              <span className="text-sm text-green-600 font-medium">To Pay</span>
             </div>
             <hr className="border-gray-200" />
             <div className="flex justify-between items-center pt-1">
